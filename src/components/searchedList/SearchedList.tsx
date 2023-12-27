@@ -1,6 +1,3 @@
-import { db } from '@/common/firebase_RK';
-import axios from 'axios';
-import { doc } from 'firebase/firestore';
 import Image from 'next/image';
 import React from 'react';
 import styled from 'styled-components';
@@ -131,9 +128,9 @@ type ListProps = {
 };
 
 export default function SearchedList({ input, photos }: ListProps) {
-  const changeData = async () => {
-    const photoRef = doc(db, 'photo', 'photos');
-  };
+  // const changeData = async () => {
+  //   const photoRef = doc(db, 'photo', 'photos');
+  // };
 
   return (
     <ListContainer>
