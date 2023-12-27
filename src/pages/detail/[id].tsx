@@ -1,4 +1,4 @@
-// import ImgZoom from '@/components/Detail/ImgZoom';
+import ImgZoom from '@/components/Detail/ImgZoom';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -20,7 +20,9 @@ export default function Detail() {
   return (
     <>
       <div>
-        <div>{/* <ImgZoom src={fetchData.urls.raw} /> */}</div>
+        <div>
+          <ImgZoom src={fetchData.urls.raw} />
+        </div>
         <div>
           <div>
             <button>다운로드</button>
