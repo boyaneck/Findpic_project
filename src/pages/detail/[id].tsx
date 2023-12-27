@@ -1,4 +1,4 @@
-import ImgZoom from '@/components/Detail/ImgZoom';
+// import ImgZoom from '@/components/Detail/ImgZoom';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React from 'react';
