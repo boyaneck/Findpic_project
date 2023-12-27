@@ -10,7 +10,9 @@ const SearchEngine = () => {
         <StSearchEngineBar placeholder="Search"></StSearchEngineBar>
       </StSearchEngineWrapper>
       <StTagContainer>
-        <StTag>전체</StTag>
+        {TAGS.map((tag, index) => {
+          return <StTag key={index}>{tag}</StTag>;
+        })}
       </StTagContainer>
     </StSearchEngineContainer>
   );
@@ -65,4 +67,13 @@ const StTagContainer = styled.ul`
 `;
 const StTag = styled.li`
   list-style-type: none;
+  border: 1px solid black;
+  width: 4rem;
+  height: 1.5rem;
+  border-radius: 3rem;
+  padding: 0.1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 `;
