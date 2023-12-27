@@ -1,7 +1,7 @@
-import { db } from "@/common/firebase_hm";
-import { collection, getDocs } from "firebase/firestore";
-import React, { useEffect } from "react";
-import { styled } from "styled-components";
+import { db } from '@/common/firebase_hm';
+import { collection, getDocs } from 'firebase/firestore';
+import React, { useEffect } from 'react';
+import { styled } from 'styled-components';
 
 const Header = () => {
   // useEffect(() => {

@@ -1,8 +1,8 @@
-import React from "react";
-import { styled } from "styled-components";
+import React from 'react';
+import { styled } from 'styled-components';
 
 const SearchEngine = () => {
-  const TAGS = ["전체", "동물", "사랑", "회사", "집"];
+  const TAGS = ['전체', '동물', '사랑', '회사', '집'];
   return (
     <StSearchEngineContainer>
       <StSearchEngineWrapper>
