@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Image from 'next/image';
 
 type ImgZoomProps = {
   src: string;
@@ -24,12 +23,12 @@ export default function ImgZoom({ src }: ImgZoomProps) {
   const [isZoomed, setIsZoomed] = useState(false);
 
   const toggleZoom = () => {
-    setIsZoomed(!isZoomed);
+    setIsZoomed((prevIsZoomed) => !prevIsZoomed);
   };
 
   return (
     <StImageZoomContainer isZoomed={isZoomed} onClick={toggleZoom}>
-      <Image src={src} alt="" width={300} height={300} />
+      <StImage src={src} alt="" width={300} height={300} />
     </StImageZoomContainer>
   );
 }

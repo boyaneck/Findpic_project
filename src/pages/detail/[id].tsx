@@ -1,20 +1,18 @@
 import ImgZoom from '@/components/Detail/ImgZoom';
+import { PhotoData, Tag } from '@/type/fetchDataType';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React from 'react';
-
-type Tag = { title: string };
-type Tags = { tags: Tag[] };
 
 export default function Detail() {
   // const {
   //   query: { id }
   // } = useRouter();
 
-  const fetchData = require('/public/data/db.json');
+  const fetchData = require('/public/data/db.json') as PhotoData;
   // console.log(fetchData);
 
-  const { tags }: Tags = fetchData;
+  const { tags } = fetchData;
 
   // unsplash
   return (
@@ -49,6 +47,7 @@ export default function Detail() {
             </div>
             <div>
               <p>다운로드</p>
+              <span>{fetchData.downloads}</span>
             </div>
           </div>
           <div>
@@ -73,11 +72,21 @@ export default function Detail() {
         </div>
       </div>
       <div>
-        {fetchData.tags.map((tag: Tag) => {
+        {tags.map((tag: Tag) => {
           return <p>{tag.title}</p>;
         })}
       </div>
-      <div></div>
+      {/* <Image src={fetchData.tags[0].source.cover_photo.urls.raw} alt="" width={200} height={300} /> */}
+      <div>
+        {tags.map((tag, index) =>
+          // tag.source && <Image key={index} src={tag.source.cover_photo.urls.raw} alt="" width={200} height={300}
+          {
+            return tag.source ? (
+              <Image key={index} src={tag.source.cover_photo.urls.raw} alt="" width={200} height={300} />
+            ) : undefined;
+          }
+        )}
+      </div>
     </>
   );
 }
