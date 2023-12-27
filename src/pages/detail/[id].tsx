@@ -10,9 +10,11 @@ export default function Detail() {
   // } = useRouter();
 
   const fetchData = require('/public/data/db.json') as PhotoData;
-  // console.log(fetchData);
-
   const { tags } = fetchData;
+
+  const handleDownload = () => {
+    console.log(fetchData.urls.raw);
+  };
 
   // unsplash
   return (
@@ -23,7 +25,7 @@ export default function Detail() {
         </div>
         <div>
           <div>
-            <button>다운로드</button>
+            <button onClick={handleDownload}>다운로드</button>
             <button>링크복사</button>
           </div>
           <div>
