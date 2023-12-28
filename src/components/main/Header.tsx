@@ -1,4 +1,4 @@
-import { db } from '@/common/firebase_hm';
+import { db } from '@/common/firebase_RK';
 import { collection, getDocs } from 'firebase/firestore';
 import React, { useEffect } from 'react';
 import { styled } from 'styled-components';

@@ -1,4 +1,4 @@
-import { db } from '../../common/firebase.my';
+import { db } from '../../common/firebase_RK';
 import { Firestore, collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import * as S from '../../styles/Main.style';
 import React, { useEffect, useState } from 'react';
