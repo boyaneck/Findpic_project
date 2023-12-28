@@ -1,24 +1,10 @@
 import { db } from '@/common/firebase_hm';
+import { MainPicListsProps } from '@/type/mainPicListsPropsType';
+import { PicList } from '@/type/picListsType';
 import { collection, getDocs } from 'firebase/firestore';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { styled } from 'styled-components';
-
-interface PicList {
-  id: string;
-  imgPath: string;
-  likes: number;
-  originID: string;
-  tags: string[];
-  writerID: string;
-}
-
-interface MainPicListsProps {
-  searchedPictures: PicList[];
-  setSearchedPictures: React.Dispatch<React.SetStateAction<PicList[]>>;
-  isSearching: boolean;
-  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
-}
 
 const MainPicLists: React.FC<MainPicListsProps> = ({
   searchedPictures,

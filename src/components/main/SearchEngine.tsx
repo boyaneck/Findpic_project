@@ -1,12 +1,6 @@
+import { SearchEngineProps } from '@/type/searchEnginePropsType';
 import React, { useState } from 'react';
 import { styled } from 'styled-components';
-
-interface SearchEngineProps {
-  searchByKeyword: (e: React.FormEvent) => void;
-  typeKeyword: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  searchKeyword: string;
-  setSearchKeyword: React.Dispatch<React.SetStateAction<string>>;
-}
 
 const SearchEngine: React.FC<SearchEngineProps> = ({
   searchByKeyword,
@@ -15,37 +9,25 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
   setSearchKeyword
 }) => {
   return (
-    <StSearchEngineContainer>
-      <StSearchEngineWrapper
-        onSubmit={(e) => {
-          searchByKeyword(e);
+    <StSearchEngineWrapper
+      onSubmit={(e) => {
+        searchByKeyword(e);
+      }}
+    >
+      <StSearchIcon src="./search-icon.png" />
+      <StSearchEngineBar
+        placeholder="Search"
+        value={searchKeyword}
+        onChange={(e) => {
+          setSearchKeyword(e.target.value);
+          typeKeyword(e);
         }}
-      >
-        <StSearchIcon src="./search-icon.png" />
-        <StSearchEngineBar
-          placeholder="Search"
-          value={searchKeyword}
-          onChange={(e) => {
-            setSearchKeyword(e.target.value);
-            typeKeyword(e);
-          }}
-        />
-      </StSearchEngineWrapper>
-    </StSearchEngineContainer>
+      />
+    </StSearchEngineWrapper>
   );
 };
 
 export default SearchEngine;
-
-const StSearchEngineContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  background-color: lightyellow;
-  margin-top: 4.5rem;
-  justify-content: center;
-  align-items: center;
-  height: 10rem;
-`;
 
 const StSearchEngineWrapper = styled.form`
   display: flex;

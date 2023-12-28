@@ -6,22 +6,14 @@ import { styled } from 'styled-components';
 import { db } from '@/common/firebase_hm';
 import { collection, getDocs } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-
-interface PicList {
-  id: string;
-  imgPath: string;
-  likes: number;
-  originID: string;
-  tags: string[];
-  writerID: string;
-}
+import { PicList } from '@/type/picListsType';
 
 const Main = () => {
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [picLists, setPicLists] = useState<PicList[]>([]);
   const [searchedPictures, setSearchedPictures] = useState<PicList[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const TAGS: string[] = ['전체', 'dog', 'park', 'girl', 'man'];
+  const TAGS: string[] = ['ALL', 'dog', 'park', 'girl', 'man'];
   const typeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(e.target.value);
     console.log(e.target.value);
@@ -75,19 +67,22 @@ const Main = () => {
   return (
     <StMainContainer>
       <Header />
-      <SearchEngine
-        searchByKeyword={searchByKeyword}
-        typeKeyword={typeKeyword}
-        searchKeyword={searchKeyword}
-        setSearchKeyword={setSearchKeyword}
-      />
-      <StTagContainer>
-        {TAGS.map((tag: string, index: number) => (
-          <StTag key={index} onClick={(e) => SearchByTag(index, e)}>
-            {tag}
-          </StTag>
-        ))}
-      </StTagContainer>
+      <StSearchEngineContainer>
+        <SearchEngine
+          searchByKeyword={searchByKeyword}
+          typeKeyword={typeKeyword}
+          searchKeyword={searchKeyword}
+          setSearchKeyword={setSearchKeyword}
+        />
+        <StTagContainer>
+          {TAGS.map((tag: string, index: number) => (
+            <StTag key={index} onClick={(e) => SearchByTag(index, e)}>
+              # {tag}
+            </StTag>
+          ))}
+        </StTagContainer>
+      </StSearchEngineContainer>
+
       <MainPicLists
         searchedPictures={searchedPictures}
         setSearchedPictures={setSearchedPictures}
@@ -120,9 +115,19 @@ const StTag = styled.li`
   width: 4rem;
   height: 1.5rem;
   border-radius: 3rem;
-  padding: 0.1rem;
+  padding: 0.09rem 0 0 0;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+`;
+
+const StSearchEngineContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: lightyellow;
+  margin-top: 4.5rem;
+  justify-content: center;
+  align-items: center;
+  height: 10rem;
 `;
