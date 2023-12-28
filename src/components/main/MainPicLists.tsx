@@ -1,7 +1,9 @@
 import { db } from '@/common/firebase_hm';
 import { MainPicListsProps } from '@/type/mainPicListsPropsType';
+
 import { PicList } from '@/type/picListsType';
 import { collection, getDocs } from 'firebase/firestore';
+import { GetServerSideProps } from 'next';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { styled } from 'styled-components';
@@ -65,6 +67,29 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
 };
 
 export default MainPicLists;
+
+// export const getServerSideProps: GetServerSideProps<MainProps> = async () => {
+//   try {
+//     const sampleCollection = collection(db, 'findpicLists');
+//     const Snapshot = await getDocs(sampleCollection);
+//     const responseData = Snapshot.docs.map((doc) => doc.data()) as PicList[];
+
+//     console.log('responseData:', responseData);
+
+//     return {
+//       props: {
+//         initialPicLists: responseData
+//       }
+//     };
+//   } catch (error) {
+//     console.error('Error fetching data:', error);
+//     return {
+//       props: {
+//         initialPicLists: []
+//       }
+//     };
+//   }
+// };
 
 const StListContainer = styled.ul`
   border: 1px solid black;

@@ -1,11 +1,10 @@
 import Header from '@/components/main/Header';
 import MainPicLists from '@/components/main/MainPicLists';
 import SearchEngine from '@/components/main/SearchEngine';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from 'styled-components';
 import { db } from '@/common/firebase_hm';
-import { collection, getDocs } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { PicList } from '@/type/picListsType';
 
 const Main = () => {
@@ -14,54 +13,48 @@ const Main = () => {
   const [searchedPictures, setSearchedPictures] = useState<PicList[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const TAGS: string[] = ['ALL', 'dog', 'park', 'girl', 'man'];
+
   const typeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(e.target.value);
-    console.log(e.target.value);
   };
 
-  const SearchByTag = (index: number, event: React.MouseEvent<HTMLLIElement>) => {
-    const selectedTag = TAGS[index];
+  const fetchSearchedListByTag = async (tag: string) => {
+    const sampleCollection = collection(db, 'findpicLists');
+    let q;
+    if (tag === 'ALL') {
+      q = query(sampleCollection);
+    } else {
+      q = query(sampleCollection, where('tags', 'array-contains', tag));
+    }
 
-    // 각 태그에 따른 동작 수행
-    switch (index) {
-      case 0:
-        // "전체" 태그 선택 시 모든 이미지 보여주기
-        setIsSearching(false);
-        setSearchedPictures([]);
-        break;
-      default:
-        // 나머지 태그 선택 시 선택된 태그와 일치하는 이미지만 보여주기
-        const searchedResultsByTag = picLists.filter((pic) => pic.tags.includes(selectedTag));
-        setIsSearching(true);
-        setSearchedPictures(searchedResultsByTag);
-        break;
+    try {
+      const Snapshot = await getDocs(q);
+      const pictureList = Snapshot.docs.map((doc) => {
+        const data = doc.data() as PicList;
+        return data;
+      });
+      setPicLists(pictureList);
+      setSearchedPictures(pictureList);
+      console.log('pictureList', pictureList);
+      return pictureList;
+    } catch (error) {
+      console.log('error', error);
+      return [];
     }
   };
 
   useEffect(() => {
-    const fetch = async () => {
-      try {
-        const sampleCollection = collection(db, 'findpicLists');
-        const Snapshot = await getDocs(sampleCollection);
-        const responseData = Snapshot.docs.map((doc) => doc.data());
-        console.log('responseData in searchEngine', responseData);
-        setPicLists(responseData as PicList[]);
-      } catch (error) {
-        console.log('error', error);
-      }
-    };
-    fetch();
+    // 초기에 전체 데이터를 불러올 수 있도록 'ALL'로 호출
+    fetchSearchedListByTag('ALL');
   }, []);
 
-  const searchByKeyword = (e: React.FormEvent) => {
+  const searchByKeyword = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSearching(true);
-    const searchedResults = picLists.filter((pic, i) => {
+    const searchedResults = picLists.filter((pic) => {
       return pic.tags.some((tag) => tag.includes(searchKeyword));
     });
-    // validationCheck();
     setSearchedPictures(searchedResults);
-    console.log('searchedResults', searchedResults);
   };
 
   return (
@@ -76,7 +69,7 @@ const Main = () => {
         />
         <StTagContainer>
           {TAGS.map((tag: string, index: number) => (
-            <StTag key={index} onClick={(e) => SearchByTag(index, e)}>
+            <StTag key={index} onClick={() => fetchSearchedListByTag(tag)}>
               # {tag}
             </StTag>
           ))}
@@ -92,6 +85,7 @@ const Main = () => {
     </StMainContainer>
   );
 };
+
 export default Main;
 
 const StMainContainer = styled.div`
@@ -120,6 +114,10 @@ const StTag = styled.li`
   justify-content: center;
   align-items: center;
   cursor: pointer;
+
+  &:hover {
+    background-color: lightgray;
+  }
 `;
 
 const StSearchEngineContainer = styled.div`
