@@ -11,10 +11,21 @@ interface PicList {
   originID: string;
   tags: string[];
   writerID: string;
-  // 필요한 다른 속성들을 추가할 수 있습니다.
 }
 
-const MainPicLists = () => {
+interface MainPicListsProps {
+  searchedPictures: PicList[];
+  setSearchedPictures: React.Dispatch<React.SetStateAction<PicList[]>>;
+  isSearching: boolean;
+  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const MainPicLists: React.FC<MainPicListsProps> = ({
+  searchedPictures,
+  setSearchedPictures,
+  isSearching,
+  setIsSearching
+}) => {
   const [picLists, setPicLists] = useState<PicList[]>([]);
   useEffect(() => {
     const fetch = async () => {
@@ -32,17 +43,37 @@ const MainPicLists = () => {
   }, []);
   return (
     <StListContainer>
-      {picLists?.map((pic) => {
-        return (
-          <StPicture key={pic.id}>
-            <p>{pic.tags}</p>
-            <p>{pic.id}</p>
-            <p>{pic.likes}</p>
-            <p>{pic.originID}</p>
-            <p>{pic.writerID}</p>
-          </StPicture>
-        );
-      })}
+      {isSearching ? (
+        <>
+          {searchedPictures?.map((pic) => {
+            return (
+              <StPicture key={pic.id}>
+                <p>{pic.tags}</p>
+                <p>{pic.id}</p>
+                <p>{pic.likes}</p>
+                <p>{pic.originID}</p>
+                <p>{pic.writerID}</p>
+                <p>{pic.tags.join(',')}</p>
+              </StPicture>
+            );
+          })}
+        </>
+      ) : (
+        <>
+          {picLists?.map((pic) => {
+            return (
+              <StPicture key={pic.id}>
+                <p>{pic.tags}</p>
+                <p>{pic.id}</p>
+                <p>{pic.likes}</p>
+                <p>{pic.originID}</p>
+                <p>{pic.writerID}</p>
+                <p>{pic.tags.join(',')}</p>
+              </StPicture>
+            );
+          })}
+        </>
+      )}
     </StListContainer>
   );
 };

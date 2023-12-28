@@ -1,28 +1,42 @@
 import React, { useState } from 'react';
 import { styled } from 'styled-components';
 
-const SearchEngine = () => {
-  const [searchKeyword, setSearchKeyword] = useState<string>('');
-  const typeKeyword = (e: any) => {
-    setSearchKeyword(e.target.value);
-    console.log(e.target.value);
-  };
+interface SearchEngineProps {
+  searchByKeyword: (e: React.FormEvent) => void;
+  typeKeyword: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  searchKeyword: string;
+  setSearchKeyword: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const SearchEngine: React.FC<SearchEngineProps> = ({
+  searchByKeyword,
+  typeKeyword,
+  searchKeyword,
+  setSearchKeyword
+}) => {
   const TAGS: string[] = ['전체', '# dog', '# park', '# girl', '# man'];
+
   return (
     <StSearchEngineContainer>
-      {/* 아래가 form */}
-      <StSearchEngineWrapper>
+      <StSearchEngineWrapper
+        onSubmit={(e) => {
+          searchByKeyword(e);
+        }}
+      >
         <StSearchIcon src="./search-icon.png" />
         <StSearchEngineBar
           placeholder="Search"
           value={searchKeyword}
-          onChange={(e) => typeKeyword(e)}
-        ></StSearchEngineBar>
+          onChange={(e) => {
+            setSearchKeyword(e.target.value);
+            typeKeyword(e);
+          }}
+        />
       </StSearchEngineWrapper>
       <StTagContainer>
-        {TAGS.map((tag: string, index: number) => {
-          return <StTag key={index}>{tag}</StTag>;
-        })}
+        {TAGS.map((tag: string, index: number) => (
+          <StTag key={index}>{tag}</StTag>
+        ))}
       </StTagContainer>
     </StSearchEngineContainer>
   );
@@ -45,7 +59,6 @@ const StSearchEngineWrapper = styled.form`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  // border: 1px solid red;
   position: relative;
 `;
 
@@ -57,16 +70,17 @@ const StSearchEngineBar = styled.input`
   padding-left: 3.7rem;
   font-size: 1rem;
 `;
+
 const StSearchIcon = styled.img`
   position: absolute;
   top: 50%;
-  left: 1.2rem; /* 원하는 간격으로 조절하세요 */
+  left: 1.2rem;
   transform: translateY(-50%);
   width: 1.2rem;
   z-index: 10000;
 `;
+
 const StTagContainer = styled.ul`
-  border: 1px solid green;
   width: 35rem;
   height: 2.5rem;
   display: flex;
@@ -75,6 +89,7 @@ const StTagContainer = styled.ul`
   align-items: center;
   padding: 0 0.5rem;
 `;
+
 const StTag = styled.li`
   list-style-type: none;
   border: 1px solid black;
