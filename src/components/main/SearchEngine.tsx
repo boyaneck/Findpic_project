@@ -14,8 +14,6 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
   searchKeyword,
   setSearchKeyword
 }) => {
-  const TAGS: string[] = ['전체', '# dog', '# park', '# girl', '# man'];
-
   return (
     <StSearchEngineContainer>
       <StSearchEngineWrapper
@@ -33,11 +31,6 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
           }}
         />
       </StSearchEngineWrapper>
-      <StTagContainer>
-        {TAGS.map((tag: string, index: number) => (
-          <StTag key={index}>{tag}</StTag>
-        ))}
-      </StTagContainer>
     </StSearchEngineContainer>
   );
 };
@@ -78,27 +71,4 @@ const StSearchIcon = styled.img`
   transform: translateY(-50%);
   width: 1.2rem;
   z-index: 10000;
-`;
-
-const StTagContainer = styled.ul`
-  width: 35rem;
-  height: 2.5rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 0.5rem;
-`;
-
-const StTag = styled.li`
-  list-style-type: none;
-  border: 1px solid black;
-  width: 4rem;
-  height: 1.5rem;
-  border-radius: 3rem;
-  padding: 0.1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
 `;

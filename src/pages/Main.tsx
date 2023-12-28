@@ -14,7 +14,6 @@ interface PicList {
   originID: string;
   tags: string[];
   writerID: string;
-  // 필요한 다른 속성들을 추가할 수 있습니다.
 }
 
 const Main = () => {
@@ -22,9 +21,29 @@ const Main = () => {
   const [picLists, setPicLists] = useState<PicList[]>([]);
   const [searchedPictures, setSearchedPictures] = useState<PicList[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
+  const TAGS: string[] = ['전체', 'dog', 'park', 'girl', 'man'];
   const typeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(e.target.value);
     console.log(e.target.value);
+  };
+
+  const SearchByTag = (index: number, event: React.MouseEvent<HTMLLIElement>) => {
+    const selectedTag = TAGS[index];
+
+    // 각 태그에 따른 동작 수행
+    switch (index) {
+      case 0:
+        // "전체" 태그 선택 시 모든 이미지 보여주기
+        setIsSearching(false);
+        setSearchedPictures([]);
+        break;
+      default:
+        // 나머지 태그 선택 시 선택된 태그와 일치하는 이미지만 보여주기
+        const searchedResultsByTag = picLists.filter((pic) => pic.tags.includes(selectedTag));
+        setIsSearching(true);
+        setSearchedPictures(searchedResultsByTag);
+        break;
+    }
   };
 
   useEffect(() => {
@@ -62,6 +81,13 @@ const Main = () => {
         searchKeyword={searchKeyword}
         setSearchKeyword={setSearchKeyword}
       />
+      <StTagContainer>
+        {TAGS.map((tag: string, index: number) => (
+          <StTag key={index} onClick={(e) => SearchByTag(index, e)}>
+            {tag}
+          </StTag>
+        ))}
+      </StTagContainer>
       <MainPicLists
         searchedPictures={searchedPictures}
         setSearchedPictures={setSearchedPictures}
@@ -76,4 +102,27 @@ export default Main;
 const StMainContainer = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+const StTagContainer = styled.ul`
+  width: 35rem;
+  height: 2.5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.5rem;
+`;
+
+const StTag = styled.li`
+  list-style-type: none;
+  border: 1px solid black;
+  width: 4rem;
+  height: 1.5rem;
+  border-radius: 3rem;
+  padding: 0.1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 `;
