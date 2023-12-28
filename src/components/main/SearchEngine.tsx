@@ -1,16 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { styled } from 'styled-components';
 
 const SearchEngine = () => {
-  const TAGS = ['전체', '동물', '사랑', '회사', '집'];
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
+  const typeKeyword = (e: any) => {
+    setSearchKeyword(e.target.value);
+    console.log(e.target.value);
+  };
+  const TAGS: string[] = ['전체', '# dog', '# park', '# girl', '# man'];
   return (
     <StSearchEngineContainer>
+      {/* 아래가 form */}
       <StSearchEngineWrapper>
         <StSearchIcon src="./search-icon.png" />
-        <StSearchEngineBar placeholder="Search"></StSearchEngineBar>
+        <StSearchEngineBar
+          placeholder="Search"
+          value={searchKeyword}
+          onChange={(e) => typeKeyword(e)}
+        ></StSearchEngineBar>
       </StSearchEngineWrapper>
       <StTagContainer>
-        {TAGS.map((tag, index) => {
+        {TAGS.map((tag: string, index: number) => {
           return <StTag key={index}>{tag}</StTag>;
         })}
       </StTagContainer>
