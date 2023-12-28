@@ -4,6 +4,7 @@ import { PhotoData, Tag } from '@/type/fetchDataType';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React from 'react';
+import styled from 'styled-components';
 const fetchData = require('/public/data/db.json') as PhotoData[];
 
 // nextjs를 쓰는 이유? -> 서버사이드 렌더링,...
@@ -36,9 +37,9 @@ export default function Detail() {
   return (
     <>
       <div>
-        <div>
+        <StImg>
           <ImgZoom src={pic.urls.raw} />
-        </div>
+        </StImg>
         <div>
           <div>
             <a download href="ImageDownload">
@@ -90,3 +91,7 @@ export default function Detail() {
     </>
   );
 }
+
+const StImg = styled.div`
+  width: 3rem;
+`;
