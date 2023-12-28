@@ -7,9 +7,9 @@ type ImgZoomProps = {
 
 const StImageZoomContainer = styled.div<{ isZoomed: boolean }>`
   transition: transform 0.3s;
-  cursor: pointer;
+  cursor: zoom-in;
 
-  ${(props) => props.isZoomed && 'transform: scale(2);'}
+  ${(props) => props.isZoomed && 'transform: scale(2);cursor: zoom-out;'}
 `;
 
 const StImage = styled.img`
@@ -28,7 +28,7 @@ export default function ImgZoom({ src }: ImgZoomProps) {
 
   return (
     <StImageZoomContainer isZoomed={isZoomed} onClick={toggleZoom}>
-      <StImage src={src} alt="" width={300} height={300} />
+      <StImage src={src} alt="" width="" height="" />
     </StImageZoomContainer>
   );
 }
