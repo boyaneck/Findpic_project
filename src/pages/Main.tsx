@@ -18,6 +18,7 @@ const Main = () => {
     setSearchKeyword(e.target.value);
   };
 
+  // 태그로 검색하기
   const fetchSearchedListByTag = async (tag: string) => {
     const sampleCollection = collection(db, 'findpicLists');
     let q;
@@ -48,14 +49,42 @@ const Main = () => {
     fetchSearchedListByTag('ALL');
   }, []);
 
+  // 검색어 직접입력으로 검색하기
+  // 검색어로 데이터 검색하기
   const searchByKeyword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSearching(true);
-    const searchedResults = picLists.filter((pic) => {
-      return pic.tags.some((tag) => tag.includes(searchKeyword));
-    });
-    setSearchedPictures(searchedResults);
+
+    if (!searchKeyword) {
+      // 검색어가 비어있으면 검색 초기화
+      setIsSearching(false);
+      // setSearchedPictures([]);
+      return;
+    }
+
+    const sampleCollection = collection(db, 'findpicLists');
+    const q = query(sampleCollection, where('tags', 'array-contains', searchKeyword.toLowerCase()));
+
+    try {
+      const Snapshot = await getDocs(q);
+      const pictureList: PicList[] = Snapshot.docs.map((doc) => doc.data() as PicList);
+
+      setIsSearching(true);
+      setSearchedPictures(pictureList);
+      console.log('검색 결과', pictureList);
+    } catch (error) {
+      console.log('에러', error);
+      setSearchedPictures([]);
+    }
   };
+
+  // const searchByKeyword = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setIsSearching(true);
+  //   const searchedResults = picLists.filter((pic) => {
+  //     return pic.tags.some((tag) => tag.includes(searchKeyword));
+  //   });
+  //   setSearchedPictures(searchedResults);
+  // };
 
   return (
     <StMainContainer>
