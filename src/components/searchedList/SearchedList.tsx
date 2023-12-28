@@ -36,63 +36,56 @@ type fetchedItem = {
 export default function SearchedList({ input, photos }: ListProps) {
   const [data, setData] = useState<any>([]);
 
-  // 이미지 fetch
   const getUnsplash = async () => {
-    const inputs = await addData();
-    console.log('data', data);
-    console.log('inputs', inputs);
-
-    // 받아 온 이미지를 순회하며 각 이미지에 해당하는 tag 생성 후 배열 형태로 반환
-    const tagsArr = await detectionTags(inputs);
-    const outputs = await tagsArr.outputs;
-
-    // 기존 데이터에 tags 추가
-    await setFinal(outputs);
-    setDB(data);
+    const inputs = await addData(); // 데이터 처리 이후 inputs 생성
+    console.log('넘기기 전 inputs', inputs);
+    const tagResult = await detectionTags(inputs);
+    console.log(tagResult);
+    await setFinal(tagResult);
   };
 
-  // const setDB = (processed: fetchedItem[]) => {
-  //   const ref = doc(db, 'photo');
-  //   processed?.forEach(async (data: fetchedItem) => {
-  //     console.log(data);
-  //     await addDoc(ref, data);
-  //   });
-  // };
-
   const addData = async () => {
-    // 한 페이지(10개)의 데이터 fetch
-    for (let i = 1; i < 2; i++) {
-      const resp = await axios.get(`https://api.unsplash.com/photos?page=${i}&client_id=${envConfig.unsplash.apiKey}`);
-      const unsplashData = await resp.data;
+    try {
+      let changed: fetchedItem[] = []; // changed 변수를 빈 배열로 초기화
 
-      // 이미지 data 잘 왔나 확인
-      console.log('unsplashData', unsplashData);
+      for (let i = 2; i < 3; i++) {
+        const resp = await axios.get(
+          `https://api.unsplash.com/photos?page=${i}&client_id=${envConfig.unsplash.apiKey}`
+        );
+        const unsplashData = await resp.data;
 
-      // 우리가 필요한 객체로 데이터 가공
-      const changed = await unsplashData.map((item: fetchedItem) => {
-        // 가공 단계
-        return { id: nanoid(), likes: 0, updated: new Date().toISOString(), imgPath: item.urls.raw, from: 'unsplash' };
+        const processedData = unsplashData.map((item: fetchedItem) => {
+          return {
+            id: nanoid(),
+            likes: 0,
+            updated: new Date().toISOString(),
+            imgPath: item.urls.raw,
+            from: 'unsplash'
+          };
+        });
+
+        changed = [...changed, ...processedData];
+      }
+
+      setData(changed); // 데이터 업데이트 후
+
+      const inputs = changed.map((item: Partial<fetchedItem>) => {
+        return {
+          data: {
+            image: {
+              url: item.imgPath
+            }
+          }
+        };
       });
 
-      // state에 가공한 데이터 저장
-      setData((prev: any) => [...changed, ...prev]);
+      console.log('Inputs:', inputs);
+
+      return inputs;
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-    console.log('input 전 data', data);
-
-    // AI에 보낼 데이터 생성
-    const inputs = await data.map((item: Partial<fetchedItem>) => {
-      return {
-        data: {
-          image: {
-            url: item.imgPath
-          }
-        }
-      };
-    });
-
-    console.log('input 후 data', data);
-
-    return inputs;
   };
 
   const detectionTags = async (inputs: any) => {
@@ -102,7 +95,7 @@ export default function SearchedList({ input, photos }: ListProps) {
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Your PAT (Personal Access Token) can be found in the portal under Authentification
-    const PAT = 'b2d95d00d6b1411dbd444b7bd025c1b7';
+    const PAT = '2a58702bb8e948e5aeb2244a08ba8cbe';
     // Specify the correct user_id/app_id pairings
     // Since you're making inferences outside your app's scope
     const USER_ID = 'clarifai';
@@ -118,6 +111,7 @@ export default function SearchedList({ input, photos }: ListProps) {
       },
       inputs: [...inputs]
     });
+
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -133,6 +127,7 @@ export default function SearchedList({ input, photos }: ListProps) {
         requestOptions
       );
       const data = await resp.json();
+      console.log('Tag Detection Result:', data);
       return data;
     } catch (err) {
       console.log(err);
@@ -141,8 +136,8 @@ export default function SearchedList({ input, photos }: ListProps) {
 
   const setDB = async (processed: fetchedItem[]) => {
     try {
-      processed.forEach(async (data: fetchedItem) => {
-        await addDoc(collection(db, 'datas'), data);
+      processed.forEach((data: fetchedItem) => {
+        addDoc(collection(db, 'datas'), data);
       });
     } catch (error) {
       console.error(error);
@@ -151,17 +146,20 @@ export default function SearchedList({ input, photos }: ListProps) {
   };
 
   const setFinal = async (Tagresult: any) => {
-    setData((prev: fetchedItem[]) =>
-      prev.map((item: fetchedItem, i: number) => {
-        return { ...item, tags: Tagresult[i]?.data.concepts };
-      })
-    );
-    console.log('finaldata', data);
+    // 기존 data와 Tagresult의 outputs를 합치는 과정
+    const newData = data.map((item: fetchedItem, i: number) => {
+      return {
+        ...item,
+        tags: Tagresult.outputs[i]?.data.concepts === undefined ? '' : Tagresult.outputs[i]?.data.concepts
+      };
+    });
+    console.log('new D', newData);
+    await setDB(newData);
   };
 
-  useEffect(() => {
-    getUnsplash();
-  }, []);
+  // useEffect(() => {
+  //   getUnsplash();
+  // }, []);
 
   return (
     <StListContainer>
