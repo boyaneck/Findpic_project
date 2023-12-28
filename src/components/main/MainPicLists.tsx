@@ -51,12 +51,11 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
           {picLists?.map((pic) => {
             return (
               <StPicture key={pic.id}>
-                <p>{pic.tags}</p>
                 <p>{pic.id}</p>
                 <p>{pic.likes}</p>
                 <p>{pic.originID}</p>
                 <p>{pic.writerID}</p>
-                <p>{pic.tags.join(',')}</p>
+                <p>{pic.tags.join(' ,')}</p>
               </StPicture>
             );
           })}
@@ -102,6 +101,7 @@ const StListContainer = styled.ul`
 const StPicture = styled.li`
   background-color: pink;
   width: 15rem;
+  height: 30rem;
   list-style: none;
 `;
 

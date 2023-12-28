@@ -1,5 +1,5 @@
-// import { PicList } from './picListsType';
+import { PicList } from './picListsType';
 
-// export interface MainProps {
-//   initialPicLists: PicList[];
-// }
+export interface MainProps {
+  initialPicLists: PicList[];
+}

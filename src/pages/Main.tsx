@@ -6,10 +6,11 @@ import { styled } from 'styled-components';
 import { db } from '@/common/firebase_hm';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { PicList } from '@/type/picListsType';
+import { MainProps } from '@/type/mainPropsType';
 
-const Main = () => {
+const Main: React.FC<MainProps> = ({ initialPicLists }) => {
+  const [picLists, setPicLists] = useState<PicList[]>(initialPicLists);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
-  const [picLists, setPicLists] = useState<PicList[]>([]);
   const [searchedPictures, setSearchedPictures] = useState<PicList[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const TAGS: string[] = ['ALL', 'dog', 'park', 'girl', 'man'];
@@ -34,6 +35,7 @@ const Main = () => {
         const data = doc.data() as PicList;
         return data;
       });
+      setIsSearching(true);
       setPicLists(pictureList);
       setSearchedPictures(pictureList);
       console.log('pictureList', pictureList);
@@ -49,7 +51,6 @@ const Main = () => {
     fetchSearchedListByTag('ALL');
   }, []);
 
-  // 검색어 직접입력으로 검색하기
   // 검색어로 데이터 검색하기
   const searchByKeyword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,15 +77,6 @@ const Main = () => {
       setSearchedPictures([]);
     }
   };
-
-  // const searchByKeyword = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setIsSearching(true);
-  //   const searchedResults = picLists.filter((pic) => {
-  //     return pic.tags.some((tag) => tag.includes(searchKeyword));
-  //   });
-  //   setSearchedPictures(searchedResults);
-  // };
 
   return (
     <StMainContainer>
@@ -116,6 +108,34 @@ const Main = () => {
 };
 
 export default Main;
+
+// 페이지가 서버에서 렌더링될 때 한 번 실행되어 초기 데이터를 가져와 페이지에 주입
+export async function getServerSideProps() {
+  const sampleCollection = collection(db, 'findpicLists');
+  const q = query(sampleCollection);
+
+  try {
+    const Snapshot = await getDocs(q);
+    const pictureList = Snapshot.docs.map((doc) => doc.data() as PicList);
+    // console.log('pictureList in serversidee', pictureList);
+    console.error('pictureList in serversidee', pictureList);
+    // 반환된 데이터를 props로 전달
+    return {
+      props: {
+        initialPicLists: pictureList
+      }
+    };
+  } catch (error) {
+    console.log('에러', error);
+
+    // 에러 발생 시 빈 배열을 props로 전달
+    return {
+      props: {
+        initialPicLists: []
+      }
+    };
+  }
+}
 
 const StMainContainer = styled.div`
   display: flex;
