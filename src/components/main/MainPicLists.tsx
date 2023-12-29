@@ -1,131 +1,160 @@
-import { db } from '../../common/firebase.my';
-import { Firestore, QuerySnapshot, collection, doc, getDoc, getDocs, query } from 'firebase/firestore';
-import * as S from '../../styles/Main.style';
+import { db } from '@/common/firebase_hm';
+import { MainPicListsProps } from '@/type/mainPicListsPropsType';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { PicList } from '@/type/picListsType';
+import { collection, getDocs } from 'firebase/firestore';
+import { GetServerSideProps } from 'next';
+import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
-import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
-import { filterdDownloadList, filterdLikeList, getPicsList } from '@/api/picsList';
-import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
+import { styled } from 'styled-components';
+import { fetchSearchedListByTag } from '@/pages/api/picLists';
 
-type SortedBy = 'id' | 'downloads' | 'likes';
-
-const MainPicLists = () => {
-  const [hoveredIndex, setHoveredIndex] = useState(null); // hover된 이미지의 인덱스를 저장합니다.
-  const [liked, setLiked] = useState(false); // 좋아요 상태를 관리하는 상태값
-  const [sortedBy, setSortedBy] = useState<SortedBy>('id');
-  const [isLikesPicsPreFetched, setIsLikesPicsPreFetched] = useState(false);
-  const [isDownloadsPicsPreFetched, setIsDownloadsPicsPreFetched] = useState(false);
-  const handleLike = () => {
-    setLiked(!liked); // 좋아요 상태를 토글합니다.
-  };
-
-  // 1.type이 id인 필드를 위에서 5개 가져온다.
-  // 2.type이 변경시 해당 queryfn을 실행
-  const { data, isError, isPending } = useQuery({
-    queryKey: ['picLists', { sortedBy }],
-    queryFn: () => {
-      if (sortedBy === 'id') return getPicsList();
-      else if (sortedBy === 'likes') return filterdLikeList();
-      else if (sortedBy === 'downloads') return filterdDownloadList();
-    }
-  });
-
+const MainPicLists: React.FC<MainPicListsProps> = ({
+  searchedPictures,
+  setSearchedPictures,
+  isSearching,
+  setIsSearching,
+  tag,
+  initialPicLists,
+  data
+}) => {
+  console.log('initialPicLists in MainPicLists', initialPicLists);
+  const [picLists, setPicLists] = useState<PicList[]>([]);
   const queryClient = useQueryClient();
-  if (isError) return <div>에러입니다..</div>;
-  if (isPending) return <div>데이터 요청중입니다...</div>;
 
-  const preFetchLikesPics = async () => {
-    if (isLikesPicsPreFetched) return;
-    await queryClient.prefetchQuery({
-      queryKey: ['picLists', { sortedBy: 'likes' }],
-      queryFn: filterdLikeList
-    });
-    setIsLikesPicsPreFetched(true);
-  };
+  // const { isLoading, isError, data } = useQuery<PicList[]>({
+  //   queryKey: ['picLists', tag],
+  //   queryFn: (a) => {
+  //     console.log('sss', a);
+  //     return fetchSearchedListByTag(tag);
+  //   }
+  // });
+  // console.log('메롱메롱');
+  // console.log('MainpucLists에서', data);
 
-  const handlerFilterdLikedPics = () => {
-    setSortedBy('likes');
-  };
-
-  const preFetchDownloadsPics = async () => {
-    if (isDownloadsPicsPreFetched) return;
-    await queryClient.prefetchQuery({
-      queryKey: ['picLists', { sortedBy: 'downloads' }],
-      queryFn: filterdDownloadList
-    });
-    setIsDownloadsPicsPreFetched(true);
-  };
-  const handlerFilterdDownloadsPics = () => {
-    setSortedBy('downloads');
-  };
-
-  //
+  // useEffect(() => {
+  //   const fetch = async () => {
+  //     try {
+  //       const sampleCollection = collection(db, 'findpicLists');
+  //       const Snapshot = await getDocs(sampleCollection);
+  //       const responseData = Snapshot.docs.map((doc) => doc.data());
+  //       console.log('responseData in mainpiclists', responseData);
+  //       setPicLists(responseData as PicList[]);
+  //     } catch (error) {
+  //       console.log('error', error);
+  //     }
+  //   };
+  //   fetch();
+  // }, []);
   return (
-    <>
-      <S.FILTER_BUTTON_WRAPPER>
-        <S.FILTER_BUTTON onMouseOver={preFetchDownloadsPics} onClick={handlerFilterdDownloadsPics}>
-          다운로드 많은순
-        </S.FILTER_BUTTON>
-        <S.FILTER_BUTTON onMouseOver={preFetchLikesPics} onClick={handlerFilterdLikedPics}>
-          좋아요 많은 순{' '}
-        </S.FILTER_BUTTON>
-      </S.FILTER_BUTTON_WRAPPER>
-
-      <S.PICS_WRAPPER>
-        <div>
-          {data?.map((pic: any, index: any) => (
-            <div
-              key={pic.id}
-              className="pic-container"
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            >
-              <img src={pic.urls} style={{ width: 'inherit', height: 'inherit' }} className="pic-image"></img>
-              {hoveredIndex === index && (
-                <div className="like-icon" onClick={handleLike}>
-                  {liked ? <AiFillHeart /> : <AiOutlineHeart />}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </S.PICS_WRAPPER>
-    </>
+    <StListContainer>
+      {data ? (
+        <>
+          {data?.map((pic) => {
+            return (
+              <StPicture key={pic.id}>
+                <p>{pic.id}</p>
+                <p>{pic.likes}</p>
+                <p>{pic.originID}</p>
+                <p>{pic.writerID}</p>
+                <p>{pic.tags}</p>
+                <Image src={pic.imgPath} alt="" width={300} height={500} />
+              </StPicture>
+            );
+          })}
+        </>
+      ) : (
+        <>
+          {/* {initialPicLists?.map((pic) => {
+            return (
+              <StPicture key={pic.id}>
+                <p>{pic.id}</p>
+                <p>{pic.likes}</p>
+                <p>{pic.originID}</p>
+                <p>{pic.writerID}</p>
+                <p>{pic.tags.join(' /')}</p>
+              </StPicture>
+            );
+          })} */}
+        </>
+      )}
+    </StListContainer>
   );
 };
 
 export default MainPicLists;
 
-// const PicContainer = styled.div`
-//   position: relative;
-//   display: inline-block;
-//   /* 이미지들이 옆으로 나열되도록 함 */
-// `;
+// export const getServerSideProps: GetServerSideProps<MainProps> = async () => {
+//   try {
+//     const sampleCollection = collection(db, 'findpicLists');
+//     const Snapshot = await getDocs(sampleCollection);
+//     const responseData = Snapshot.docs.map((doc) => doc.data()) as PicList[];
 
-// // 좋아요 아이콘 스타일
-// const LikeIcon = styled.div`
-//   position: absolute;
-//   top: 5px;
-//   right: 5px;
-//   opacity: 0;
-//   transition: opacity 0.3s ease;
+//     console.log('responseData:', responseData);
 
-//   ${PicContainer}:hover & {
-//     opacity: 1;
+//     return {
+//       props: {
+//         initialPicLists: responseData
+//       }
+//     };
+//   } catch (error) {
+//     console.error('Error fetching data:', error);
+//     return {
+//       props: {
+//         initialPicLists: []
+//       }
+//     };
 //   }
+// };
 
-//   svg {
-//     transition: fill 0.3s ease; /* 색상 변경 트랜지션 */
-//     fill: ${(props) => (props.liked ? 'red' : 'black')}; /* 클릭 여부에 따라 색상 변경 */
-//     cursor: pointer;
-//   }
+const StListContainer = styled.ul`
+  border: 1px solid black;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: center;
+`;
 
-//   &:hover svg {
-//     fill: red; /* 마우스 호버 시 색상 변경 */
-//   }
-// `;
+const StPicture = styled.li`
+  background-color: pink;
+  width: 15rem;
+  height: 30rem;
+  list-style: none;
+`;
 
-// // 이미지 스타일
-// const PicImage = styled.img`
-//   width: inherit;
-//   height: inherit;
-// `;
+// import { db } from '../../common/firebase.my';
+// import { Firestore, collection, doc, getDoc, getDocs } from 'firebase/firestore';
+// import * as S from '../../styles/Main.style';
+// import React, { useEffect, useState } from 'react';
+
+// const MainPicLists = () => {
+//   const [piclists, setPicLists] = useState([]);
+//   useEffect(() => {
+//     const fetch = async () => {
+//       try {
+//         const sampleCollection = collection(db, 'sample');
+//         const Snapshot = await getDocs(sampleCollection);
+//         return Snapshot.docs;
+//       } catch (error) {
+//         console.log('error를 말해', error);
+//       }
+//     };
+//     fetch().then((res) =>
+//       console.log(
+//         'res',
+//         res?.map((list) => list.data())
+//       )
+//     );
+//   }, []);
+
+//   return (
+//     <>
+//       <S.FILTER_BUTTON_WRAPPER>
+//         <S.FILTER_BUTTON>다운로드 많은순</S.FILTER_BUTTON>
+//         <S.FILTER_BUTTON>좋아요 많은 순 </S.FILTER_BUTTON>
+//       </S.FILTER_BUTTON_WRAPPER>
+//     </>
+//   );
+// };
+
+// export default MainPicLists;

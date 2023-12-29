@@ -1,0 +1,76 @@
+{
+  "status": { "code": 10000, "description": "Ok", "req_id": "c73031f2c58910806774afc196b83257" },
+  "outputs": [
+    {
+      "id": "b44ca42a9db24d19b7f0ab10ff26d520",
+      "status": { "code": 10000, "description": "Ok" },
+      "created_at": "2023-12-28T07:18:46.457097423Z",
+      "model": {
+        "id": "general-image-recognition",
+        "name": "Image Recognition",
+        "created_at": "2016-03-09T17:11:39.608845Z",
+        "modified_at": "2023-12-18T08:54:35.172716Z",
+        "app_id": "main",
+        "model_version": {
+          "id": "aa7f35c01e0642fda5cf400f543e7c40",
+          "created_at": "2018-03-06T21:10:24.454834Z",
+          "status": { "code": 21100, "description": "Model is trained and ready" },
+          "visibility": { "gettable": 50 },
+          "app_id": "main",
+          "user_id": "clarifai",
+          "metadata": {}
+        },
+        "user_id": "clarifai",
+        "model_type_id": "visual-classifier",
+        "visibility": { "gettable": 50 },
+        "toolkits": [],
+        "use_cases": [],
+        "languages": [],
+        "languages_full": [],
+        "check_consents": [],
+        "workflow_recommended": false,
+        "image": {
+          "url": "https://data.clarifai.com/large/users/clarifai/apps/main/input_owners/luv_2261/inputs/image/00ba04ce6efa93784f4473a96d5ee9b0",
+          "hosted": {
+            "prefix": "https://data.clarifai.com",
+            "suffix": "users/clarifai/apps/main/input_owners/luv_2261/inputs/image/00ba04ce6efa93784f4473a96d5ee9b0",
+            "sizes": ["large", "small"],
+            "crossorigin": "use-credentials"
+          }
+        }
+      },
+      "input": {
+        "id": "dd2482125e414f64817683f019d3dd96",
+        "data": {
+          "image": {
+            "url": "https://images.unsplash.com/photo-1682685797439-a05dd915cee9?ixid=M3w1NDU1NTl8MXwxfGFsbHwxfHx8fHx8Mnx8MTcwMzc0NzUyNnw\u0026ixlib=rb-4.0.3"
+          }
+        }
+      },
+      "data": {
+        "concepts": [
+          { "id": "ai_VRmbGVWh", "name": "travel", "value": 0.977405, "app_id": "main" },
+          { "id": "ai_ms7bQmJj", "name": "rock", "value": 0.97329867, "app_id": "main" },
+          { "id": "ai_tBcWlsCp", "name": "nature", "value": 0.9716955, "app_id": "main" },
+          { "id": "ai_MTvKbKJv", "name": "landscape", "value": 0.9676739, "app_id": "main" },
+          { "id": "ai_786Zr311", "name": "no person", "value": 0.9654787, "app_id": "main" },
+          { "id": "ai_Zmhsv0Ch", "name": "outdoors", "value": 0.9598005, "app_id": "main" },
+          { "id": "ai_lNsKfmXb", "name": "sky", "value": 0.94491345, "app_id": "main" },
+          { "id": "ai_TjbmxC6B", "name": "tree", "value": 0.9325252, "app_id": "main" },
+          { "id": "ai_VJXZtfth", "name": "mountain", "value": 0.9303462, "app_id": "main" },
+          { "id": "ai_XNxf76KN", "name": "sunset", "value": 0.92277, "app_id": "main" },
+          { "id": "ai_F2HCr31R", "name": "cliff", "value": 0.91968894, "app_id": "main" },
+          { "id": "ai_6w9F49lS", "name": "hike", "value": 0.91031575, "app_id": "main" },
+          { "id": "ai_D9G1C2xX", "name": "desert", "value": 0.9075113, "app_id": "main" },
+          { "id": "ai_vlSMGdgb", "name": "sandstone", "value": 0.90740365, "app_id": "main" },
+          { "id": "ai_Kk8v0Mtd", "name": "valley", "value": 0.87887406, "app_id": "main" },
+          { "id": "ai_n9vjC1jB", "name": "light", "value": 0.87485653, "app_id": "main" },
+          { "id": "ai_1d4Qk7Nr", "name": "sun", "value": 0.8696533, "app_id": "main" },
+          { "id": "ai_PBTpj0kl", "name": "park", "value": 0.84988827, "app_id": "main" },
+          { "id": "ai_m0QjgGWQ", "name": "canyon", "value": 0.84691036, "app_id": "main" },
+          { "id": "ai_lN6KXkcl", "name": "dawn", "value": 0.84548944, "app_id": "main" }
+        ]
+      }
+    }
+  ]
+}

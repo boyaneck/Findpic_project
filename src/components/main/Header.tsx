@@ -1,26 +1,7 @@
-import { db } from '@/common/firebase_hm';
-import { collection, getDocs } from 'firebase/firestore';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { styled } from 'styled-components';
 
 const Header = () => {
-  // useEffect(() => {
-  //   const fetch = async () => {
-  //     try {
-  //       const sampleCollection = collection(db, "findpicLists");
-  //       const Snapshot = await getDocs(sampleCollection);
-  //       return Snapshot.docs;
-  //     } catch (error) {
-  //       console.log("error", error);
-  //     }
-  //   };
-  //   fetch().then((res) =>
-  //     console.log(
-  //       "res",
-  //       res?.map((list) => list.data())
-  //     )
-  //   );
-  // }, []);
   return (
     <StHeaderContainer>
       <StHeaderContentContainer>
@@ -59,6 +40,7 @@ const StHeaderContentContainer = styled.div`
 const StLogoTitle = styled.p`
   font-size: 1.8rem;
   font-weight: 900;
+  cursor: pointer;
 `;
 
 const StLoginButton = styled.button`
