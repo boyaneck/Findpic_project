@@ -1,12 +1,11 @@
 import { db } from '@/common/firebase_RK';
 import axios from 'axios';
-import { Firestore, addDoc, collection, doc, getDocs, setDoc } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import envConfig from '../../../config';
 import { nanoid } from '@reduxjs/toolkit';
-import firebase from 'firebase/compat/app';
 
 type ListProps = {
   input: string;
@@ -26,49 +25,63 @@ type fetchedItem = {
   originId: string | number;
   urls: { raw: string };
   imgPath: string;
-  tags: [];
+  tags: string[];
   likes: number;
   userId?: string;
   from: string;
   updatedAt: string;
+  largeImageURL?: string;
+  user_id: string;
 };
 
 export default function SearchedList({ input, photos }: ListProps) {
   const [data, setData] = useState<any>([]);
 
+  // 검색 테스트
+  const getDB = async (tag: string) => {
+    const PhotoRef = collection(db, 'photos');
+    let q = query(PhotoRef, where('tags', 'array-contains', tag));
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id, ' => ', doc.data());
+    });
+  };
+
+  // unsplash API 통신 - 데이터 가공 - DB저장까지
   const getUnsplash = async () => {
     const inputs = await addData(); // 데이터 처리 이후 inputs 생성
-    console.log('넘기기 전 inputs', inputs);
     const tagResult = await detectionTags(inputs);
-    console.log(tagResult);
+
     await setFinal(tagResult);
   };
 
+  // Unsplash 데이터 저장
   const addData = async () => {
     try {
       let changed: fetchedItem[] = []; // changed 변수를 빈 배열로 초기화
 
-      for (let i = 2; i < 3; i++) {
+      for (let i = 100; i < 105; i++) {
         const resp = await axios.get(
           `https://api.unsplash.com/photos?page=${i}&client_id=${envConfig.unsplash.apiKey}`
         );
         const unsplashData = await resp.data;
-
-        const processedData = unsplashData.map((item: fetchedItem) => {
+        const processedData = unsplashData.map((item: any) => {
           return {
             id: nanoid(),
             likes: 0,
             updated: new Date().toISOString(),
             imgPath: item.urls.raw,
-            from: 'unsplash'
+            from: 'unsplash',
+            user_id: item.user.id
           };
         });
 
         changed = [...changed, ...processedData];
       }
-
       setData(changed); // 데이터 업데이트 후
 
+      // 자동 태그 생성을 적용할 image 리스트
       const inputs = changed.map((item: Partial<fetchedItem>) => {
         return {
           data: {
@@ -78,9 +91,6 @@ export default function SearchedList({ input, photos }: ListProps) {
           }
         };
       });
-
-      console.log('Inputs:', inputs);
-
       return inputs;
     } catch (error) {
       console.error(error);
@@ -88,19 +98,11 @@ export default function SearchedList({ input, photos }: ListProps) {
     }
   };
 
+  // 이미지 태그 자동생성 함수
   const detectionTags = async (inputs: any) => {
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    // In this section, we set the user authentication, user and app ID, model details, and the URL
-    // of the image we want as an input. Change these strings to run your own example.
-    //////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // Your PAT (Personal Access Token) can be found in the portal under Authentification
-    const PAT = '2a58702bb8e948e5aeb2244a08ba8cbe';
-    // Specify the correct user_id/app_id pairings
-    // Since you're making inferences outside your app's scope
+    const PAT = 'd3ff3a7c34bf46f99c8c33deec1d089b';
     const USER_ID = 'clarifai';
     const APP_ID = 'main';
-    // Change these to whatever model and image URL you want to use
     const MODEL_ID = 'general-image-recognition';
     const MODEL_VERSION_ID = 'aa7f35c01e0642fda5cf400f543e7c40';
 
@@ -127,17 +129,18 @@ export default function SearchedList({ input, photos }: ListProps) {
         requestOptions
       );
       const data = await resp.json();
-      console.log('Tag Detection Result:', data);
+
       return data;
     } catch (err) {
       console.log(err);
     }
   };
 
+  // DB에 가공 된 값을 저장
   const setDB = async (processed: fetchedItem[]) => {
     try {
       processed.forEach((data: fetchedItem) => {
-        addDoc(collection(db, 'datas'), data);
+        addDoc(collection(db, 'photos'), data);
       });
     } catch (error) {
       console.error(error);
@@ -145,21 +148,46 @@ export default function SearchedList({ input, photos }: ListProps) {
     }
   };
 
+  // 태그 속성을 추가한 최종 가공데이터를 DB에 저장
   const setFinal = async (Tagresult: any) => {
     // 기존 data와 Tagresult의 outputs를 합치는 과정
     const newData = data.map((item: fetchedItem, i: number) => {
       return {
         ...item,
-        tags: Tagresult.outputs[i]?.data.concepts === undefined ? '' : Tagresult.outputs[i]?.data.concepts
+        tags:
+          Tagresult.outputs[i].data?.concepts === undefined
+            ? ''
+            : [...Tagresult.outputs[i].data?.concepts].map((el) => el.name)
       };
     });
-    console.log('new D', newData);
+
     await setDB(newData);
   };
 
-  // useEffect(() => {
-  //   getUnsplash();
-  // }, []);
+  useEffect(() => {
+    // getUnsplash();
+    // getPixabay();
+    // getDB('dog');
+  }, []);
+
+  // Pixabay 데이터 가져와서 가공 후 저장하는 함수
+  const getPixabay = async () => {
+    const res = await axios.get(`https://pixabay.com/api?page=27&key=${process.env.NEXT_PUBLIC_PIXABAY_API_KEY}`);
+    const photoData = await res.data;
+    const procced = photoData.hits.map((item: any) => {
+      return {
+        id: nanoid(),
+        from: 'pixabay',
+        imgPath: item.largeImageURL,
+        likes: 0,
+        tags: [...item.tags.split(',')],
+        updated: new Date().toISOString(),
+        user_id: item.user_id
+      };
+    });
+
+    setDB(procced);
+  };
 
   return (
     <StListContainer>

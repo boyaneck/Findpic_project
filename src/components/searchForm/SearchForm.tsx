@@ -22,14 +22,11 @@ export default function SearchFrom({ input, setInput, photos, setPhotos }: FormP
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const result = await axios.get(`https://api.unsplash.com/search/photos?query=${input}&client_id=${KEY}`);
-
     const data = await result.data;
-    console.log(data);
+
     setPhotos(data.results);
     setInput('');
   };
-
-  console.log(photos);
 
   return (
     <StSearchContainer>
