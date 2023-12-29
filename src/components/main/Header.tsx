@@ -1,26 +1,26 @@
-import { db } from '@/common/firebase_hm';
+import { db } from '@/common/firebase_RK';
 import { collection, getDocs } from 'firebase/firestore';
 import React, { useEffect } from 'react';
 import { styled } from 'styled-components';
 
 const Header = () => {
-  // useEffect(() => {
-  //   const fetch = async () => {
-  //     try {
-  //       const sampleCollection = collection(db, "findpicLists");
-  //       const Snapshot = await getDocs(sampleCollection);
-  //       return Snapshot.docs;
-  //     } catch (error) {
-  //       console.log("error", error);
-  //     }
-  //   };
-  //   fetch().then((res) =>
-  //     console.log(
-  //       "res",
-  //       res?.map((list) => list.data())
-  //     )
-  //   );
-  // }, []);
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const sampleCollection = collection(db, 'findpicLists');
+        const Snapshot = await getDocs(sampleCollection);
+        return Snapshot.docs;
+      } catch (error) {
+        console.log('error', error);
+      }
+    };
+    fetch().then((res) =>
+      console.log(
+        'res',
+        res?.map((list) => list.data())
+      )
+    );
+  }, []);
   return (
     <StHeaderContainer>
       <StHeaderContentContainer>
