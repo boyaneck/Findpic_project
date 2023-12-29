@@ -19,7 +19,7 @@ const { hostname } = require('os');
 // module.exports = nextConfig;
 
 const nextConfig = {
-  reactStrictMode: true,
+  // reactStrictMode: true,
   compiler: {
     styledComponents: true
   },
