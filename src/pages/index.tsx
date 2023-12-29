@@ -43,7 +43,7 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const TAGS: string[] = ['ALL', 'dog', 'park', 'girl', 'man'];
   const [tag, setTag] = useState<sortedBy>('ALL');
-  const [likes, setLikes] = useState<sortedByLike | undefined>('undefined');
+  const [likes, setLikes] = useState<sortedByLike>('undefined');
   const typeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(e.target.value);
   };
@@ -62,17 +62,20 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     queryKey: ['picLists', tag, searchKeyword, likes],
     queryFn: (a) => {
       console.log('sss', a);
-      return fetchSearchedListByTag(tag);
+      return fetchSearchedListByTag(tag, searchKeyword, likes);
     }
   });
 
-  console.log('선택된 태그로 필터링된 데이터', data);
+  // console.log('선택된 태그로 필터링된 데이터', data);
+  console.log('쿼리키에 따른 데이터 in index', data);
 
   return (
     <StMainContainer>
       <Header />
       <StSearchEngineContainer>
         <SearchEngine
+          tag={tag}
+          likes={likes}
           searchByKeyword={searchByKeyword}
           typeKeyword={typeKeyword}
           searchKeyword={searchKeyword}

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+// import { NextRequest, NextResponse } from 'next/server';
 
-type Data = {};
+// type Data = {};
 
-export default function handler(req: NextRequest, res: NextResponse<Data[]>) {
-  res.status(200).json();
-}
+// export default function handler(req: NextRequest, res: NextResponse<Data[]>) {
+//   res.status(200).json();
+// }

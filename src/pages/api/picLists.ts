@@ -21,28 +21,61 @@ export const getPicsList = async () => {
 };
 
 // 태그검색
-export const fetchSearchedListByTag = async (tag: string): Promise<PicList[]> => {
+export const fetchSearchedListByTag = async (
+  tag: string,
+  searchKeyword: string,
+  likes: sortedByLike
+): Promise<PicList[]> => {
   const sampleCollection = collection(db, 'findpicLists');
   //3개의 인자를 받는다 , 태그,검색어,좋아요
   //태그만 값이 들어올때 -> ()=>{}
   //검색어만 들어 올때  ->  ()=>{}
   //좋아요만 들어올 때 -> ()=>{}
   //
+  //검색어만 들어올때
+  if (searchKeyword) {
+    const sampleCollection = collection(db, 'findpicLists');
+    const q = query(sampleCollection, where('tags', 'array-contains', searchKeyword.toLowerCase()));
 
-  let q;
-  if (tag === 'ALL') {
-    q = query(sampleCollection);
-  } else {
-    q = query(sampleCollection, where('tags', 'array-contains', tag));
+    const Snapshot = await getDocs(q);
+    const pictureList: PicList[] = Snapshot.docs.map((doc) => doc.data() as PicList);
+    console.log('검색 결과 in picLists', pictureList);
+    return pictureList;
   }
+  //태그만 들어올때
+  if (tag) {
+    let q;
+    if (tag === 'ALL') {
+      q = query(sampleCollection);
+    } else {
+      q = query(sampleCollection, where('tags', 'array-contains', tag));
+    }
 
-  const Snapshot = await getDocs(q);
-  const pictureList = Snapshot.docs.map((doc) => {
-    const data = doc.data() as PicList;
-    return data;
-  });
+    const Snapshot = await getDocs(q);
+    const pictureList = Snapshot.docs.map((doc) => {
+      const data = doc.data() as PicList;
+      return data;
+    });
 
-  return pictureList;
+    return pictureList;
+  }
+  //좋아요만 들어왔을 때
+  if (likes) {
+    const sampleCollection = collection(db, 'findpicLists');
+    const q = query(sampleCollection, orderBy('likes', 'desc'), limit(5));
+
+    const snapshot = await getDocs(q);
+    const picList = snapshot.docs.map((doc) => {
+      const data = doc.data() as PicList;
+      return data;
+    });
+
+    console.log('liked 필터링 ', picList); // Log to verify data
+
+    return picList;
+  }
+  //일단 여기는 보류
+  return [];
 };
 
 // 검색어로 데이터 검색하기
@@ -70,44 +103,19 @@ export const searchByKeyword = async (e: React.FormEvent, searchKeyword: string)
 };
 
 //좋아요
-export const filterdLikeList = async () => {
-  const sampleCollection = collection(db, 'sample');
-  const q = query(sampleCollection, orderBy('likes', 'desc'), limit(5));
+// export const filterdLikeList = async () => {
+//   const sampleCollection = collection(db, 'sample');
+//   const q = query(sampleCollection, orderBy('likes', 'desc'), limit(5));
 
-  try {
-    const snapshot = await getDocs(q);
-    const picList = snapshot.docs.map((doc) => doc.data());
+//   try {
+//     const snapshot = await getDocs(q);
+//     const picList = snapshot.docs.map((doc) => doc.data());
 
-    console.log('liked 필터링 ', picList); // Log to verify data
+//     console.log('liked 필터링 ', picList); // Log to verify data
 
-    return picList;
-  } catch (error) {
-    console.error('Error getting documents: ', error);
-    throw error;
-  }
-};
-
-//다운로드
-export const filterdDownloadList = async () => {
-  const sampleCollection = collection(db, 'sample');
-  const q = query(sampleCollection, orderBy('downloads', 'desc'), limit(5));
-
-  try {
-    const snapshot = await getDocs(q);
-    const picList = snapshot.docs.map((doc) => doc.data());
-
-    console.log('downloads 필터링 ', picList); // Log to verify data
-
-    return picList;
-  } catch (error) {
-    console.error('Error getting documents: ', error);
-    throw error;
-  }
-};
-
-//infinitequery func
-// export const ssss=(페이지)=>{
-//     const sampleCollection = collection(db, 'sample');
-//   const q = query(sampleCollection, orderBy('페이지'), limit(5));
-
-// }
+//     return picList;
+//   } catch (error) {
+//     console.error('Error getting documents: ', error);
+//     throw error;
+//   }
+// };

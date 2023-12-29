@@ -1,3 +1,4 @@
+import { fetchSearchedListByTag } from '@/pages/api/picLists';
 import { SearchEngineProps } from '@/type/searchEnginePropsType';
 import React, { useState } from 'react';
 import { styled } from 'styled-components';
@@ -6,13 +7,15 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
   searchByKeyword,
   typeKeyword,
   searchKeyword,
-  setSearchKeyword
+  setSearchKeyword,
+  likes,
+  tag
 }) => {
   return (
     <StSearchEngineWrapper
       onSubmit={(e) => {
         e.preventDefault();
-        searchByKeyword(e, searchKeyword);
+        fetchSearchedListByTag(tag, searchKeyword, likes);
       }}
     >
       <StSearchIcon src="./search-icon.png" />
