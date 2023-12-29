@@ -1,10 +1,10 @@
-import { db } from '@/common/firebase_hm';
+import { db } from '@/common/firebase_RK';
 import { PicList } from '@/type/picListsType';
 import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
 
 //초기 데이터를 가져오는
 export const getPicsList = async () => {
-  const sampleCollection = collection(db, 'sample');
+  const sampleCollection = collection(db, 'photos');
   const q = query(sampleCollection, orderBy('id'), limit(5)); // 필요한 경우 정렬 방식을 지정할 수 있습니다.
 
   try {
@@ -26,7 +26,7 @@ export const fetchSearchedListByTag = async (
   searchKeyword: string,
   likes: sortedByLike
 ): Promise<PicList[]> => {
-  const sampleCollection = collection(db, 'findpicLists');
+  const sampleCollection = collection(db, 'photos');
   //3개의 인자를 받는다 , 태그,검색어,좋아요
   //태그만 값이 들어올때 -> ()=>{}
   //검색어만 들어 올때  ->  ()=>{}
@@ -34,7 +34,7 @@ export const fetchSearchedListByTag = async (
   //
   //검색어만 들어올때
   if (searchKeyword) {
-    const sampleCollection = collection(db, 'findpicLists');
+    const sampleCollection = collection(db, 'photos');
     const q = query(sampleCollection, where('tags', 'array-contains', searchKeyword.toLowerCase()));
 
     const Snapshot = await getDocs(q);
@@ -61,7 +61,7 @@ export const fetchSearchedListByTag = async (
   }
   //좋아요만 들어왔을 때
   if (likes) {
-    const sampleCollection = collection(db, 'findpicLists');
+    const sampleCollection = collection(db, 'photos');
     const q = query(sampleCollection, orderBy('likes', 'desc'), limit(5));
 
     const snapshot = await getDocs(q);
@@ -91,7 +91,7 @@ export const searchByKeyword = async (e: React.FormEvent, searchKeyword: string)
   //   return;
   // }
 
-  const sampleCollection = collection(db, 'findpicLists');
+  const sampleCollection = collection(db, 'photos');
   const q = query(sampleCollection, where('tags', 'array-contains', searchKeyword.toLowerCase()));
 
   const Snapshot = await getDocs(q);

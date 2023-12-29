@@ -108,13 +108,13 @@ export default Main;
 
 // 페이지가 서버에서 렌더링될 때 한 번 실행되어 초기 데이터를 가져와 페이지에 주입
 export async function getServerSideProps() {
-  const sampleCollection = collection(db, 'findpicLists');
+  const sampleCollection = collection(db, 'photos');
   const q = query(sampleCollection);
 
   try {
     const Snapshot = await getDocs(q);
     const pictureList = Snapshot.docs.map((doc) => doc.data() as PicList);
-    // console.log('pictureList in serversidee', pictureList);
+    console.log('pictureList in serversidee', pictureList);
     // console.error('pictureList in serversidee', pictureList);
     // 반환된 데이터를 props로 전달
     return {
