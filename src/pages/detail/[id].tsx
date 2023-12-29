@@ -61,8 +61,8 @@ export default function Detail({ pic, searchTagsResult, error }: Props) {
       </StTags>
       <div>
         <h4>관련사진</h4>
-        {searchTagsResult?.map((item) => {
-          return <Image src={item.imgPath} alt="" width={100} height={100} />;
+        {searchTagsResult?.map((item, idx) => {
+          return <Image key={idx} src={item.imgPath} alt="" width={100} height={100} />;
         })}
       </div>
     </StContainer>
