@@ -11,3 +11,15 @@ export const fetchGetPhotoData = async (id: string | string[]) => {
 
   return data.length > 0 ? data[0] : null;
 };
+
+export const fetchTagPhotoData = async (tags: string[]) => {
+  const q = query(collection(db, 'findpicLists'), where('tags', 'array-contains-any', tags));
+
+  const querySnapshot = await getDocs(q);
+
+  const data = querySnapshot.docs.map((doc) => {
+    return doc.data();
+  });
+
+  return data;
+};
