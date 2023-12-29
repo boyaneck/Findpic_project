@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Image from 'next/image';
 
-type ImgZoomProps = {
+type Props = {
   src: string;
 };
 
-const StImageZoomContainer = styled.div<{ isZoomed: boolean }>`
+const StImageZoomContainer = styled.div<{ iszoomed: boolean }>`
   transition: transform 0.3s;
-  cursor: pointer;
+  cursor: zoom-in;
 
-  ${(props) => props.isZoomed && 'transform: scale(2);'}
+  ${(props) => props.iszoomed && 'transform: scale(2);cursor: zoom-out;'}
 `;
 
 const StImage = styled.img`
@@ -20,16 +19,16 @@ const StImage = styled.img`
   margin: 0 auto;
 `;
 
-export default function ImgZoom({ src }: ImgZoomProps) {
+export default function ImgZoom({ src }: Props) {
   const [isZoomed, setIsZoomed] = useState(false);
 
   const toggleZoom = () => {
-    setIsZoomed(!isZoomed);
+    setIsZoomed((prevIsZoomed) => !prevIsZoomed);
   };
 
   return (
-    <StImageZoomContainer isZoomed={isZoomed} onClick={toggleZoom}>
-      <Image src={src} alt="" width={300} height={300} />
+    <StImageZoomContainer iszoomed={isZoomed} onClick={toggleZoom}>
+      <StImage src={src} alt="" width="" height="" />
     </StImageZoomContainer>
   );
 }
