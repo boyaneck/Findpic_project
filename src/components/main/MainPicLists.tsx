@@ -1,34 +1,49 @@
 import { db } from '@/common/firebase_hm';
 import { MainPicListsProps } from '@/type/mainPicListsPropsType';
-
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { PicList } from '@/type/picListsType';
 import { collection, getDocs } from 'firebase/firestore';
 import { GetServerSideProps } from 'next';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { styled } from 'styled-components';
+import { fetchSearchedListByTag } from '@/pages/api/picLists';
 
 const MainPicLists: React.FC<MainPicListsProps> = ({
   searchedPictures,
   setSearchedPictures,
   isSearching,
-  setIsSearching
+  setIsSearching,
+  tag,
+  initialPicLists
 }) => {
+  console.log('initialPicLists in MainPicLists', initialPicLists);
   const [picLists, setPicLists] = useState<PicList[]>([]);
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const sampleCollection = collection(db, 'findpicLists');
-        const Snapshot = await getDocs(sampleCollection);
-        const responseData = Snapshot.docs.map((doc) => doc.data());
-        console.log('responseData in mainpiclists', responseData);
-        setPicLists(responseData as PicList[]);
-      } catch (error) {
-        console.log('error', error);
-      }
-    };
-    fetch();
-  }, []);
+  const queryClient = useQueryClient();
+  // const { isLoading, isError, data } = useQuery<PicList[]>({
+  //   queryKey: ['picLists', tag],
+  //   queryFn: (a) => {
+  //     console.log('sss', a);
+  //     return fetchSearchedListByTag(tag);
+  //   }
+  // });
+  // console.log('메롱메롱');
+  // console.log('MainpucLists에서', data);
+
+  // useEffect(() => {
+  //   const fetch = async () => {
+  //     try {
+  //       const sampleCollection = collection(db, 'findpicLists');
+  //       const Snapshot = await getDocs(sampleCollection);
+  //       const responseData = Snapshot.docs.map((doc) => doc.data());
+  //       console.log('responseData in mainpiclists', responseData);
+  //       setPicLists(responseData as PicList[]);
+  //     } catch (error) {
+  //       console.log('error', error);
+  //     }
+  //   };
+  //   fetch();
+  // }, []);
   return (
     <StListContainer>
       {isSearching ? (
@@ -36,7 +51,6 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
           {searchedPictures?.map((pic) => {
             return (
               <StPicture key={pic.id}>
-                <p>{pic.tags}</p>
                 <p>{pic.id}</p>
                 <p>{pic.likes}</p>
                 <p>{pic.originID}</p>
