@@ -2,9 +2,49 @@ import axios from 'axios';
 import React, { ChangeEvent, FormEvent, useState } from 'react';
 import styled from 'styled-components';
 import envConfig from '../../../config';
-import { getStaticProps } from 'next/dist/build/templates/pages';
 
-const SearchContainer = styled.div`
+type FormProps = {
+  input: string;
+  setInput: React.Dispatch<React.SetStateAction<string>>;
+  photos: {}[];
+  setPhotos: React.Dispatch<React.SetStateAction<[]>>;
+};
+
+export default function SearchFrom({ input, setInput, photos, setPhotos }: FormProps) {
+  const KEY = envConfig.unsplash.apiKey;
+
+  const testItems = ['rose', 'night', 'christmas', 'present', 'dog', 'winter'];
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    setInput(e.target.value);
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const result = await axios.get(`https://api.unsplash.com/search/photos?query=${input}&client_id=${KEY}`);
+    const data = await result.data;
+
+    setPhotos(data.results);
+    setInput('');
+  };
+
+  return (
+    <StSearchContainer>
+      <StSearchInputWrapper onSubmit={handleSubmit}>
+        <StSearchInputEl onChange={handleChange} value={input} />
+        <StTagSection>
+          <StTagLists>
+            {testItems.map((item, i) => {
+              return <StTags key={i}># {item}</StTags>;
+            })}
+          </StTagLists>
+        </StTagSection>
+      </StSearchInputWrapper>
+    </StSearchContainer>
+  );
+}
+
+const StSearchContainer = styled.div`
   width: 100%;
   max-width: 1440px;
   background-color: #eee;
@@ -12,12 +52,12 @@ const SearchContainer = styled.div`
   color: black;
 `;
 
-const SearchInputWrapper = styled.form`
+const StSearchInputWrapper = styled.form`
   width: 100%;
   padding: 3rem 9rem;
 `;
 
-const SearchInputEl = styled.input.attrs({
+const StSearchInputEl = styled.input.attrs({
   placeholder: '찾고 싶은 것을 입력하세요!'
 })`
   width: 100%;
@@ -33,12 +73,12 @@ const SearchInputEl = styled.input.attrs({
   }
 `;
 
-const TagSection = styled.section`
+const StTagSection = styled.section`
   width: 100%;
   padding: 1rem 0;
 `;
 
-const TagLists = styled.ul`
+const StTagLists = styled.ul`
   width: 100%;
   display: flex;
   align-items: center;
@@ -48,7 +88,7 @@ const TagLists = styled.ul`
   }
 `;
 
-const Tags = styled.li`
+const StTags = styled.li`
   width: fit-content;
   padding: 0.45rem 1rem;
   border: 1px solid black;
@@ -60,48 +100,3 @@ const Tags = styled.li`
     color: white;
   }
 `;
-
-type FormProps = {
-  input: string;
-  setInput: React.Dispatch<React.SetStateAction<string>>;
-  photos: {}[];
-  setPhotos: React.Dispatch<React.SetStateAction<[]>>;
-};
-
-export default function SearchFrom({ input, setInput, photos, setPhotos }: FormProps) {
-  const KEY = envConfig.unsplash.apiKey;
-  console.log(KEY);
-
-  const testItems = ['rose', 'night', 'christmas', 'present', 'dog', 'winter'];
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setInput(e.target.value);
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    const result = await axios.get(
-      `https://api.unsplash.com/search/photos?query=${input}&client_id=${String(envConfig.unsplash.apiKey)}`
-    );
-    const data = await result.data;
-    setPhotos(data.results);
-    setInput('');
-  };
-
-  console.log(photos);
-
-  return (
-    <SearchContainer>
-      <SearchInputWrapper onSubmit={handleSubmit}>
-        <SearchInputEl onChange={handleChange} value={input} />
-        <TagSection>
-          <TagLists>
-            {testItems.map((item, i) => {
-              return <Tags key={i}># {item}</Tags>;
-            })}
-          </TagLists>
-        </TagSection>
-      </SearchInputWrapper>
-    </SearchContainer>
-  );
-}

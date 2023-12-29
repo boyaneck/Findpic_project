@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import envConfig from '../../config';
 
@@ -7,7 +7,8 @@ import envConfig from '../../config';
 const firebaseConfig = envConfig.db.firebaseConfig;
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);
