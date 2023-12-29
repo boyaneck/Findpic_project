@@ -12,7 +12,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchSearchedListByTag } from './api/picLists';
 import { sortedBy } from '@/type/sortedByType';
 import { InitialPicLists } from '@/type/initialPicLists';
-
+import { searchByKeyword } from './api/picLists';
 //--------------------------------
 // type SortedBy = 'id' | 'downloads' | 'likes';
 
@@ -43,6 +43,7 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const TAGS: string[] = ['ALL', 'dog', 'park', 'girl', 'man'];
   const [tag, setTag] = useState<sortedBy>('ALL');
+  const [likes, setLikes] = useState<sortedByLike | undefined>('undefined');
   const typeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(e.target.value);
   };
@@ -55,64 +56,17 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     if (tags === 'park') setTag(tags);
     if (tags === 'girl') setTag(tags);
     if (tags === 'man') setTag(tags);
-    // console.log('ssss',tags)
   };
   const queryClient = useQueryClient();
   const { isLoading, isError, data } = useQuery<PicList[]>({
-    queryKey: ['picLists', 'dog', '검색', '좋아요'],
+    queryKey: ['picLists', tag, searchKeyword, likes],
     queryFn: (a) => {
       console.log('sss', a);
       return fetchSearchedListByTag(tag);
     }
   });
-  //querykey :['piclist',dog]
-  //querykey:['piclist',검색,좋아요]
 
   console.log('선택된 태그로 필터링된 데이터', data);
-
-  // const mutation = useMutation((tag: string) => fetchSearchedListByTag(tag), {
-  //   onSuccess: (data) => {
-  //     setIsSearching(true);
-  //     setPicLists(data);
-  //     setSearchedPictures(data);
-  //     console.log('pictureList', data);
-
-  //     // 성공 시 쿼리 다시 불러오기 (옵션)
-  //     queryClient.invalidateQueries(['picLists', 'ALL']);
-  //   }
-  // });
-
-  // useEffect(() => {
-  //   // 초기에 전체 데이터를 불러올 수 있도록 'ALL'로 호출
-  //   fetchSearchedListByTag('ALL');
-  // }, []);
-
-  // 검색어로 데이터 검색하기
-  const searchByKeyword = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!searchKeyword) {
-      // 검색어가 비어있으면 검색 초기화
-      setIsSearching(false);
-      // setSearchedPictures([]);
-      return;
-    }
-
-    const sampleCollection = collection(db, 'findpicLists');
-    const q = query(sampleCollection, where('tags', 'array-contains', searchKeyword.toLowerCase()));
-
-    try {
-      const Snapshot = await getDocs(q);
-      const pictureList: PicList[] = Snapshot.docs.map((doc) => doc.data() as PicList);
-
-      setIsSearching(true);
-      setSearchedPictures(pictureList);
-      console.log('검색 결과', pictureList);
-    } catch (error) {
-      console.log('에러', error);
-      setSearchedPictures([]);
-    }
-  };
 
   return (
     <StMainContainer>

@@ -11,7 +11,8 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
   return (
     <StSearchEngineWrapper
       onSubmit={(e) => {
-        searchByKeyword(e);
+        e.preventDefault();
+        searchByKeyword(e, searchKeyword);
       }}
     >
       <StSearchIcon src="./search-icon.png" />

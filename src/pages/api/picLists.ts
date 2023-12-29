@@ -23,6 +23,11 @@ export const getPicsList = async () => {
 // 태그검색
 export const fetchSearchedListByTag = async (tag: string): Promise<PicList[]> => {
   const sampleCollection = collection(db, 'findpicLists');
+  //3개의 인자를 받는다 , 태그,검색어,좋아요
+  //태그만 값이 들어올때 -> ()=>{}
+  //검색어만 들어 올때  ->  ()=>{}
+  //좋아요만 들어올 때 -> ()=>{}
+  //
 
   let q;
   if (tag === 'ALL') {
@@ -31,7 +36,6 @@ export const fetchSearchedListByTag = async (tag: string): Promise<PicList[]> =>
     q = query(sampleCollection, where('tags', 'array-contains', tag));
   }
 
-  // try {
   const Snapshot = await getDocs(q);
   const pictureList = Snapshot.docs.map((doc) => {
     const data = doc.data() as PicList;
@@ -39,6 +43,30 @@ export const fetchSearchedListByTag = async (tag: string): Promise<PicList[]> =>
   });
 
   return pictureList;
+};
+
+// 검색어로 데이터 검색하기
+// export const searchByKeyword = async (e: React.FormEvent) => {
+//   e.preventDefault();
+export const searchByKeyword = async (e: React.FormEvent, searchKeyword: string) => {
+  // e.preventDefault();
+  console.log('searchKeyword in MainPicLists', searchKeyword);
+  // if (!searchKeyword) {
+  //   // 검색어가 비어있으면 검색 초기화
+  //   setIsSearching(false);
+  //   // setSearchedPictures([]);
+  //   return;
+  // }
+
+  const sampleCollection = collection(db, 'findpicLists');
+  const q = query(sampleCollection, where('tags', 'array-contains', searchKeyword.toLowerCase()));
+
+  const Snapshot = await getDocs(q);
+  const pictureList: PicList[] = Snapshot.docs.map((doc) => doc.data() as PicList);
+
+  // setIsSearching(true);
+  // setSearchedPictures(pictureList);
+  console.log('검색 결과 in picLists', pictureList);
 };
 
 //좋아요
