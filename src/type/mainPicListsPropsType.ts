@@ -9,4 +9,5 @@ export interface MainPicListsProps {
   setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
   tag: sortedBy;
   initialPicLists: InitialPicLists;
+  data: PicList[] | undefined;
 }

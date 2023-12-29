@@ -15,11 +15,13 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
   isSearching,
   setIsSearching,
   tag,
-  initialPicLists
+  initialPicLists,
+  data
 }) => {
   console.log('initialPicLists in MainPicLists', initialPicLists);
   const [picLists, setPicLists] = useState<PicList[]>([]);
   const queryClient = useQueryClient();
+
   // const { isLoading, isError, data } = useQuery<PicList[]>({
   //   queryKey: ['picLists', tag],
   //   queryFn: (a) => {
@@ -46,9 +48,9 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
   // }, []);
   return (
     <StListContainer>
-      {isSearching ? (
+      {data ? (
         <>
-          {searchedPictures?.map((pic) => {
+          {data?.map((pic) => {
             return (
               <StPicture key={pic.id}>
                 <p>{pic.id}</p>
@@ -62,17 +64,17 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
         </>
       ) : (
         <>
-          {picLists?.map((pic) => {
+          {/* {initialPicLists?.map((pic) => {
             return (
               <StPicture key={pic.id}>
                 <p>{pic.id}</p>
                 <p>{pic.likes}</p>
                 <p>{pic.originID}</p>
                 <p>{pic.writerID}</p>
-                <p>{pic.tags.join(' ,')}</p>
+                <p>{pic.tags.join(' /')}</p>
               </StPicture>
             );
-          })}
+          })} */}
         </>
       )}
     </StListContainer>

@@ -98,6 +98,7 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
         isSearching={isSearching}
         tag={tag}
         initialPicLists={initialPicLists}
+        data={data}
       />
     </StMainContainer>
   );
