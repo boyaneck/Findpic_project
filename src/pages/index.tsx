@@ -114,7 +114,6 @@ export async function getServerSideProps() {
   try {
     const Snapshot = await getDocs(q);
     const pictureList = Snapshot.docs.map((doc) => doc.data() as PicList);
-    console.log('pictureList in serversidee', pictureList);
     // console.error('pictureList in serversidee', pictureList);
     // 반환된 데이터를 props로 전달
     return {
