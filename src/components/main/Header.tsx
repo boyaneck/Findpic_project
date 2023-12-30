@@ -2,6 +2,7 @@ import React from 'react';
 import { styled } from 'styled-components';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const Header = () => {
   const { data: session } = useSession();
@@ -19,7 +20,13 @@ const Header = () => {
               <StLogin onClick={() => signOut()}>LOGOUT</StLogin>
             )}
           </StLoginButton>
-          {session?.user?.image && <StUserImage src={session.user.image} width={50} height={50} alt="User Image" />}
+          {session?.user?.image && (
+            <Link href="/mypage" legacyBehavior>
+              <a>
+                <StUserImage src={session.user.image} width={50} height={50} alt="User Image" />
+              </a>
+            </Link>
+          )}
         </StLoginContainer>
       </StHeaderContentContainer>
     </StHeaderContainer>
@@ -51,7 +58,7 @@ const StUserImage = styled(Image)`
   width: 3rem;
   height: 3rem;
   border-radius: 10rem;
-  border: 1px solid red;
+  // border: 1px solid red;
 `;
 
 const StHeaderContentContainer = styled.div`

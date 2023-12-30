@@ -12,7 +12,11 @@ const options: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || ''
     })
-  ]
+  ],
+  session: {
+    // 세션 쿠키의 유효 기간 (초 단위) 1일로 설정
+    maxAge: 24 * 60 * 60
+  }
 };
 
 export default NextAuth(options);

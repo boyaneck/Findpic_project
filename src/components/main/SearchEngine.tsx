@@ -11,13 +11,20 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
   likes,
   tag
 }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchKeyword.trim() !== '') {
+      await fetchSearchedListByTag(tag, searchKeyword, likes);
+    }
+  };
   return (
-    <StSearchEngineWrapper
-      onSubmit={(e) => {
-        e.preventDefault();
-        fetchSearchedListByTag(tag, searchKeyword, likes);
-      }}
-    >
+    // <StSearchEngineWrapper
+    //   onSubmit={(e) => {
+    //     e.preventDefault();
+    //     fetchSearchedListByTag(tag, searchKeyword, likes);
+    //   }}
+    // >
+    <StSearchEngineWrapper onSubmit={handleSubmit}>
       <StSearchIcon src="./search-icon.png" />
       <StSearchEngineBar
         placeholder="Search"

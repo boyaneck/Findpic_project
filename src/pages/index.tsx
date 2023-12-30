@@ -47,7 +47,8 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
   const [tag, setTag] = useState<sortedBy>('ALL');
   const [likes, setLikes] = useState<sortedByLike>('undefined');
   const typeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchKeyword(e.target.value);
+    const typedKeyword = e.target.value;
+    setSearchKeyword(typedKeyword);
   };
 
   const { data: session, status } = useSession();
