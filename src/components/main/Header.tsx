@@ -1,14 +1,21 @@
 import React from 'react';
 import { styled } from 'styled-components';
+import { useSession, signIn, signOut } from 'next-auth/react';
 
 const Header = () => {
+  const { data: session } = useSession();
+  console.log('session in Header', session);
   return (
     <StHeaderContainer>
       <StHeaderContentContainer>
         <StLogoTitle>Findpic</StLogoTitle>
         <StLoginButton>
           <StGoogleLogo src="./google-logo.png" />
-          <StLogin>LOGIN</StLogin>
+          {!session ? (
+            <StLogin onClick={() => signIn('google', { callbackUrl: 'http://localhost:3000' })}>LOGIN</StLogin>
+          ) : (
+            <StLogin onClick={() => signOut()}>LOGOUT</StLogin>
+          )}
         </StLoginButton>
       </StHeaderContentContainer>
     </StHeaderContainer>

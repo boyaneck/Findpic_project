@@ -13,6 +13,8 @@ import { fetchSearchedListByTag } from './api/picLists';
 import { sortedBy } from '@/type/sortedByType';
 import { InitialPicLists } from '@/type/initialPicLists';
 import { searchByKeyword } from './api/picLists';
+import { useSession, signIn, signOut } from 'next-auth/react';
+
 //--------------------------------
 // type SortedBy = 'id' | 'downloads' | 'likes';
 
@@ -48,7 +50,10 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     setSearchKeyword(e.target.value);
   };
 
+  const { data: session, status } = useSession();
+  console.log('session in index', session);
   console.log('initialPicLists', initialPicLists);
+  console.log('status', status);
 
   const changeTagType = (tags: string) => {
     if (tags === 'ALL') setTag(tags);
