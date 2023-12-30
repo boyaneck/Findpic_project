@@ -1,4 +1,4 @@
-import { db } from '@/common/firebase_RK';
+import { db } from '@/common/firebase_hm';
 import { PicList } from '@/type/picListsType';
 import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
 

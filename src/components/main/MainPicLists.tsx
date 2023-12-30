@@ -58,7 +58,7 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
                 <p>{pic.originID}</p>
                 <p>{pic.writerID}</p>
                 <p>{pic.tags}</p>
-                <Image src={pic.imgPath} alt="" width={300} height={500} />
+                {/* <Image src={pic.imgPath} alt="" width={300} height={500} /> */}
               </StPicture>
             );
           })}
