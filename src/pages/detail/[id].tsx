@@ -5,6 +5,9 @@ import { GetServerSideProps } from 'next';
 import ImgZoom from '@/components/Detail/ImgZoom';
 import { FirebasePhotoData } from '@/type/firebaseDataType';
 import Image from 'next/image';
+import downloadImage from '../../../utils/downloadImage';
+
+// http://localhost:3000/detail/UOrBkUP_6CgEwDE6tAvvM
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const query = context.query;
@@ -40,15 +43,21 @@ export default function Detail({ pic, searchTagsResult, error }: Props) {
   }
 
   return (
-    <StContainer>
+    <div>
       <StImgContainer>
         <StImg>
           <ImgZoom src={pic.imgPath} />
         </StImg>
         <div>
-          <a download href="ImageDownload">
+          <button
+            onClick={() => {
+              const imageUrl = `${pic.imgPath}`;
+              const imageName = '로고_스택오버플로우.png';
+              downloadImage(imageUrl, imageName);
+            }}
+          >
             다운로드
-          </a>
+          </button>
           <div>
             <span>{pic.likes}</span>
           </div>
@@ -62,17 +71,12 @@ export default function Detail({ pic, searchTagsResult, error }: Props) {
       <div>
         <h4>관련사진</h4>
         {searchTagsResult?.map((item, idx) => {
-          return <Image key={idx} src={item.imgPath} alt="" width={100} height={100} />;
+          return <Image key={idx} src={item.imgPath} alt="" width={500} height={400} />;
         })}
       </div>
-    </StContainer>
+    </div>
   );
 }
-
-const StContainer = styled.div`
-  max-width: 1440px;
-  margin: 0 auto;
-`;
 
 const StImgContainer = styled.div`
   display: flex;
@@ -85,4 +89,5 @@ const StImg = styled.div`
 
 const StTags = styled.div`
   display: flex;
+  gap: 10px;
 `;
