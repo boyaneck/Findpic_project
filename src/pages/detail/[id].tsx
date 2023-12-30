@@ -63,11 +63,14 @@ export default function Detail({ pic, searchTagsResult, error }: Props) {
           </div>
         </div>
       </StImgContainer>
-      <StTags>
-        {pic.tags.map((tag, index) => {
-          return <p key={tag + index}>{tag}</p>;
-        })}
-      </StTags>
+      <div>
+        <h3>태그</h3>
+        <StTags>
+          {pic.tags.map((tag, index) => {
+            return <p key={tag + index}>{tag}</p>;
+          })}
+        </StTags>
+      </div>
       <div>
         <h4>관련사진</h4>
         {searchTagsResult?.map((item, idx) => {
