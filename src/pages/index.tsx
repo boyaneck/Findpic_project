@@ -12,7 +12,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchSearchedListByTag } from './api/picLists';
 import { sortedBy } from '@/type/sortedByType';
 import { InitialPicLists } from '@/type/initialPicLists';
-import { searchByKeyword } from './api/picLists';
+// import { searchByKeyword } from './api/picLists';
 import { useSession, signIn, signOut } from 'next-auth/react';
 
 //--------------------------------
@@ -48,8 +48,10 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
   const [likes, setLikes] = useState<sortedByLike>('undefined');
   const typeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
     const typedKeyword = e.target.value;
+    console.log('typeKeyword', typeKeyword);
     setSearchKeyword(typedKeyword);
   };
+  // typeKeyword
 
   const { data: session, status } = useSession();
   console.log('session in index', session);
@@ -82,7 +84,6 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
         <SearchEngine
           tag={tag}
           likes={likes}
-          searchByKeyword={searchByKeyword}
           typeKeyword={typeKeyword}
           searchKeyword={searchKeyword}
           setSearchKeyword={setSearchKeyword}

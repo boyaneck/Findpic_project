@@ -79,29 +79,29 @@ export const fetchSearchedListByTag = async (
 };
 
 // 검색어로 데이터 검색하기
-export const searchByKeyword = async (e: React.FormEvent, searchKeyword: string) => {
-  e.preventDefault();
-  console.log('searchKeyword in MainPicLists', searchKeyword);
-  // if (!searchKeyword) {
-  //   // 검색어가 비어있으면 검색 초기화
-  //   setIsSearching(false);
-  //   // setSearchedPictures([]);
-  //   return;
-  // }
+// export const searchByKeyword = async (e: React.FormEvent, searchKeyword: string) => {
+//   e.preventDefault();
+//   console.log('searchKeyword in MainPicLists', searchKeyword);
+//   // if (!searchKeyword) {
+//   //   // 검색어가 비어있으면 검색 초기화
+//   //   setIsSearching(false);
+//   //   // setSearchedPictures([]);
+//   //   return;
+//   // }
 
-  const keywords = searchKeyword.toLowerCase().split(' ').filter(Boolean);
+//   const keywords = searchKeyword.toLowerCase().split(' ').filter(Boolean);
 
-  const sampleCollection = collection(db, 'photos');
-  // const q = query(sampleCollection, where('tags', 'array-contains', searchKeyword.toLowerCase()));
-  const q = query(sampleCollection, where('tags', 'array-contains-any', keywords));
+//   const sampleCollection = collection(db, 'photos');
+//   // const q = query(sampleCollection, where('tags', 'array-contains', searchKeyword.toLowerCase()));
+//   const q = query(sampleCollection, where('tags', 'array-contains-any', keywords));
 
-  const Snapshot = await getDocs(q);
-  const pictureList: PicList[] = Snapshot.docs.map((doc) => doc.data() as PicList);
+//   const Snapshot = await getDocs(q);
+//   const pictureList: PicList[] = Snapshot.docs.map((doc) => doc.data() as PicList);
 
-  // setIsSearching(true);
-  // setSearchedPictures(pictureList);
-  console.log('검색 결과 in picLists', pictureList);
-};
+//   // setIsSearching(true);
+//   // setSearchedPictures(pictureList);
+//   console.log('검색 결과 in picLists', pictureList);
+// };
 
 //좋아요
 // export const filterdLikeList = async () => {

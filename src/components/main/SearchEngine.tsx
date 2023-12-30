@@ -3,15 +3,14 @@ import { SearchEngineProps } from '@/type/searchEnginePropsType';
 import React, { useState } from 'react';
 import { styled } from 'styled-components';
 
-const SearchEngine: React.FC<SearchEngineProps> = ({
-  searchByKeyword,
-  typeKeyword,
-  searchKeyword,
-  setSearchKeyword,
-  likes,
-  tag
-}) => {
-  const handleSubmit = async (e: React.FormEvent) => {
+const SearchEngine: React.FC<SearchEngineProps> = ({ typeKeyword, searchKeyword, setSearchKeyword, likes, tag }) => {
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (searchKeyword.trim() !== '') {
+  //     await fetchSearchedListByTag(tag, searchKeyword, likes);
+  //   }
+  // };
+  const handleSubmit = async (e: React.FormEvent, searchKeyword: string) => {
     e.preventDefault();
     if (searchKeyword.trim() !== '') {
       await fetchSearchedListByTag(tag, searchKeyword, likes);
@@ -24,14 +23,18 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
     //     fetchSearchedListByTag(tag, searchKeyword, likes);
     //   }}
     // >
-    <StSearchEngineWrapper onSubmit={handleSubmit}>
+    <StSearchEngineWrapper onSubmit={(e) => handleSubmit(e, searchKeyword)}>
       <StSearchIcon src="./search-icon.png" />
       <StSearchEngineBar
         placeholder="Search"
         value={searchKeyword}
         onChange={(e) => {
-          setSearchKeyword(e.target.value);
-          typeKeyword(e);
+          const typingKeyword = e.target.value;
+          // handleSubmit(e, typingKeyword:string);
+          // setSearchKeyword(e.target.value);
+          // console.log('searchKeyword', searchKeyword);
+          // typeKeyword(e);
+          setSearchKeyword(typingKeyword);
         }}
       />
     </StSearchEngineWrapper>
