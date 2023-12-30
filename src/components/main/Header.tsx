@@ -1,6 +1,7 @@
 import React from 'react';
 import { styled } from 'styled-components';
 import { useSession, signIn, signOut } from 'next-auth/react';
+import Image from 'next/image';
 
 const Header = () => {
   const { data: session } = useSession();
@@ -9,14 +10,17 @@ const Header = () => {
     <StHeaderContainer>
       <StHeaderContentContainer>
         <StLogoTitle>Findpic</StLogoTitle>
-        <StLoginButton>
-          <StGoogleLogo src="./google-logo.png" />
-          {!session ? (
-            <StLogin onClick={() => signIn('google', { callbackUrl: 'http://localhost:3000' })}>LOGIN</StLogin>
-          ) : (
-            <StLogin onClick={() => signOut()}>LOGOUT</StLogin>
-          )}
-        </StLoginButton>
+        <StLoginContainer>
+          <StLoginButton>
+            <StGoogleLogo src="./google-logo.png" />
+            {!session ? (
+              <StLogin onClick={() => signIn('google', { callbackUrl: 'http://localhost:3000' })}>LOGIN</StLogin>
+            ) : (
+              <StLogin onClick={() => signOut()}>LOGOUT</StLogin>
+            )}
+          </StLoginButton>
+          {session?.user?.image && <StUserImage src={session.user.image} width={50} height={50} alt="User Image" />}
+        </StLoginContainer>
       </StHeaderContentContainer>
     </StHeaderContainer>
   );
@@ -33,6 +37,21 @@ const StHeaderContainer = styled.div`
   border: 1px solid black;
   justify-content: center;
   align-items: center;
+`;
+
+const StLoginContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const StUserImage = styled(Image)`
+  width: 3rem;
+  height: 3rem;
+  border-radius: 10rem;
+  border: 1px solid red;
 `;
 
 const StHeaderContentContainer = styled.div`
