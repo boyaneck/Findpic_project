@@ -58,16 +58,16 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     if (tags === 'man') setTag(tags);
   };
   const queryClient = useQueryClient();
-  const { isLoading, isError, data } = useQuery<PicList[]>({
-    queryKey: ['picLists', tag, searchKeyword, likes],
-    queryFn: (a) => {
-      console.log('sss', a);
-      return fetchSearchedListByTag(tag, searchKeyword, likes);
-    }
-  });
+  // const { isLoading, isError, data } = useQuery<PicList[]>({
+  //   queryKey: ['picLists', tag, searchKeyword, likes],
+  //   queryFn: (a) => {
+  //     console.log('sss', a);
+  //     return fetchSearchedListByTag(tag, searchKeyword, likes);
+  //   }
+  // });
 
   // console.log('선택된 태그로 필터링된 데이터', data);
-  console.log('쿼리키에 따른 데이터 in index', data);
+  // console.log('쿼리키에 따른 데이터 in index', data);
 
   return (
     <StMainContainer>
@@ -98,7 +98,7 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
         isSearching={isSearching}
         tag={tag}
         initialPicLists={initialPicLists}
-        data={data}
+        // data={data}
       />
     </StMainContainer>
   );
@@ -108,7 +108,7 @@ export default Main;
 
 // 페이지가 서버에서 렌더링될 때 한 번 실행되어 초기 데이터를 가져와 페이지에 주입
 export async function getServerSideProps() {
-  const sampleCollection = collection(db, 'photos');
+  const sampleCollection = collection(db, 'datas');
   const q = query(sampleCollection);
 
   try {
