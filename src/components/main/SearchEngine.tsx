@@ -3,19 +3,31 @@ import { SearchEngineProps } from '@/type/searchEnginePropsType';
 import React, { useState } from 'react';
 import { styled } from 'styled-components';
 
-const SearchEngine: React.FC<SearchEngineProps> = ({ typeKeyword, searchKeyword, setSearchKeyword, likes, tag }) => {
+const SearchEngine: React.FC<SearchEngineProps> = ({
+  searchKeyword,
+  setSearchKeyword,
+  likes,
+  tag,
+  typingKeyword,
+  setTypingKeyword
+}) => {
   // const handleSubmit = async (e: React.FormEvent) => {
   //   e.preventDefault();
   //   if (searchKeyword.trim() !== '') {
   //     await fetchSearchedListByTag(tag, searchKeyword, likes);
   //   }
   // };
-  const handleSubmit = async (e: React.FormEvent, searchKeyword: string) => {
+  // const [typingKeyword, setTypingKeyword] = useState<string>('');
+  const handleSubmit = async (e: React.FormEvent, typingKeyword: string) => {
     e.preventDefault();
-    if (searchKeyword.trim() !== '') {
-      await fetchSearchedListByTag(tag, searchKeyword, likes);
-    }
+    // if (searchKeyword.trim() !== '') {
+    //   await fetchSearchedListByTag(tag, searchKeyword, likes);
+    // }
+    setSearchKeyword(typingKeyword);
+    console.log('searchKeyword now:', searchKeyword);
+    fetchSearchedListByTag(tag, searchKeyword, likes);
   };
+
   return (
     // <StSearchEngineWrapper
     //   onSubmit={(e) => {
@@ -23,20 +35,21 @@ const SearchEngine: React.FC<SearchEngineProps> = ({ typeKeyword, searchKeyword,
     //     fetchSearchedListByTag(tag, searchKeyword, likes);
     //   }}
     // >
-    <StSearchEngineWrapper onSubmit={(e) => handleSubmit(e, searchKeyword)}>
+    <StSearchEngineWrapper onSubmit={(e) => handleSubmit(e, typingKeyword)}>
       <StSearchIcon src="./search-icon.png" />
       <StSearchEngineBar
         placeholder="Search"
-        value={searchKeyword}
+        value={typingKeyword}
         onChange={(e) => {
-          const typingKeyword = e.target.value;
+          // const typingKeyword = e.target.value;
           // handleSubmit(e, typingKeyword:string);
           // setSearchKeyword(e.target.value);
           // console.log('searchKeyword', searchKeyword);
           // typeKeyword(e);
-          setSearchKeyword(typingKeyword);
+          setTypingKeyword(e.target.value);
         }}
       />
+      searchKeyword:{searchKeyword}TypingKeyword:{typingKeyword}
     </StSearchEngineWrapper>
   );
 };

@@ -46,11 +46,12 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
   const TAGS: string[] = ['ALL', 'dog', 'park', 'girl', 'man'];
   const [tag, setTag] = useState<sortedBy>('ALL');
   const [likes, setLikes] = useState<sortedByLike>('undefined');
-  const typeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const typedKeyword = e.target.value;
-    console.log('typeKeyword', typeKeyword);
-    setSearchKeyword(typedKeyword);
-  };
+  const [typingKeyword, setTypingKeyword] = useState<string>('');
+  // const typeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const typedKeyword = e.target.value;
+  //   console.log('typeKeyword', typeKeyword);
+  //   setSearchKeyword(typedKeyword);
+  // };
   // typeKeyword
 
   const { data: session, status } = useSession();
@@ -84,9 +85,10 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
         <SearchEngine
           tag={tag}
           likes={likes}
-          typeKeyword={typeKeyword}
           searchKeyword={searchKeyword}
           setSearchKeyword={setSearchKeyword}
+          typingKeyword={typingKeyword}
+          setTypingKeyword={setTypingKeyword}
         />
         <StTagContainer>
           {TAGS.map((tag: string, index: number) => (
