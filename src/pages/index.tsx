@@ -42,7 +42,7 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [searchedPictures, setSearchedPictures] = useState<PicList[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const TAGS: string[] = ['ALL', 'dog', 'park', 'girl', 'man'];
+  const TAGS: string[] = ['ALL', 'dog', 'park', 'girl', 'man', 'night', 'sky'];
   const [tag, setTag] = useState<sortedBy>('ALL');
   const [likes, setLikes] = useState<sortedByLike>('undefined');
   const [typingKeyword, setTypingKeyword] = useState<string>('');
@@ -58,6 +58,8 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     if (tags === 'park') setTag(tags);
     if (tags === 'girl') setTag(tags);
     if (tags === 'man') setTag(tags);
+    // if (tags === 'night') setTag(tags);
+    // if (tags === 'sky') setTag(tags);
   };
   const queryClient = useQueryClient();
   const { isLoading, isError, data } = useQuery<PicList[]>({
@@ -144,36 +146,37 @@ const StMainContainer = styled.div`
 `;
 
 const StTagContainer = styled.ul`
+  margin-top: 1.5rem;
   width: 35rem;
-  height: 2.5rem;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 0.5rem;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
 `;
 
 const StTag = styled.li`
-  list-style-type: none;
-  border: 1px solid black;
-  width: 4rem;
-  height: 1.5rem;
-  border-radius: 3rem;
-  padding: 0.09rem 0 0 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+  padding: 8px 16px; /* 상하좌우 여백 */
+  border: 1px solid #ccc;
+  color: #333;
+  transition: transform 0.2s, box-shadow 0.3s;
+  border-radius: 20px; /* 더 둥근 모서리 */
+  background-color: #f9f9f9;
+  text-align: center;
+  list-style: none; /* 기본 목록 스타일 제거 */
 
   &:hover {
-    background-color: lightgray;
+    transform: translateY(-2px);
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-weight: bold;
+    background-color: white;
   }
 `;
 
 const StSearchEngineContainer = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: lightyellow;
+  background-color: white;
   margin-top: 4.5rem;
   justify-content: center;
   align-items: center;

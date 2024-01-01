@@ -41,7 +41,6 @@ const StHeaderContainer = styled.div`
   z-index: 1000;
   width: 100%;
   height: 4.5rem;
-  border: 1px solid black;
   justify-content: center;
   align-items: center;
   background-color: white;
@@ -82,12 +81,30 @@ const StLoginButton = styled.button`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
-  border-radius: 2rem;
-  width: 7rem;
+  gap: 0.2rem;
+  background-color: white;
   height: 3rem;
-  border: 1px solid black;
+  border: none;
   cursor: pointer;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0; /* 초기에는 선이 없도록 설정 */
+    height: 1px;
+    background-color: black; /* 선의 색상 */
+    transition: width 0.3s; /* 선이 나타날 때 애니메이션 효과 설정 */
+  }
+
+  &:hover::before {
+    width: 100%; /* 선의 너비를 100%로 확장하여 선이 나타나도록 설정 */
+  }
+  &:hover {
+    font-weight: bold;
+  }
 `;
 
 const StGoogleLogo = styled.img`
