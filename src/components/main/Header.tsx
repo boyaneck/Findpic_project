@@ -44,6 +44,7 @@ const StHeaderContainer = styled.div`
   border: 1px solid black;
   justify-content: center;
   align-items: center;
+  background-color: white;
 `;
 
 const StLoginContainer = styled.div`

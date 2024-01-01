@@ -10,4 +10,7 @@ export interface MainPicListsProps {
   tag: sortedBy;
   initialPicLists: InitialPicLists;
   data: PicList[] | undefined;
+  likes: sortedByLike;
+  searchKeyword: string;
+  setLikes: React.Dispatch<React.SetStateAction<sortedByLike>>;
 }

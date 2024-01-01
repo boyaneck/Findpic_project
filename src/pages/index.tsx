@@ -40,24 +40,17 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
   const [picLists, setPicLists] = useState<PicList[]>();
 
   const [searchKeyword, setSearchKeyword] = useState<string>('');
-  // const [searchKeyword, setSearchKeyword] = useState<sortedBy>('ALL');
   const [searchedPictures, setSearchedPictures] = useState<PicList[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const TAGS: string[] = ['ALL', 'dog', 'park', 'girl', 'man'];
   const [tag, setTag] = useState<sortedBy>('ALL');
   const [likes, setLikes] = useState<sortedByLike>('undefined');
   const [typingKeyword, setTypingKeyword] = useState<string>('');
-  // const typeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const typedKeyword = e.target.value;
-  //   console.log('typeKeyword', typeKeyword);
-  //   setSearchKeyword(typedKeyword);
-  // };
-  // typeKeyword
 
   const { data: session, status } = useSession();
-  console.log('session in index', session);
-  console.log('initialPicLists', initialPicLists);
-  console.log('status', status);
+  // console.log('session in index', session);
+  // console.log('initialPicLists', initialPicLists);
+  // console.log('status', status);
 
   const changeTagType = (tags: string) => {
     if (tags === 'ALL') setTag(tags);
@@ -70,14 +63,13 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
   const { isLoading, isError, data } = useQuery<PicList[]>({
     queryKey: ['picLists', tag, searchKeyword, likes],
     queryFn: (a) => {
-      console.log('sss', a);
+      // console.log('sss', a);
       return fetchSearchedListByTag(tag, searchKeyword, likes);
     }
   });
-
-  // console.log('선택된 태그로 필터링된 데이터', data);
-  console.log('쿼리키에 따른 데이터 in index', data);
-
+  //------------
+  // console.log('쿼리키에 따른 데이터 in index', data);
+  //----------------------------
   return (
     <StMainContainer>
       <Header />
@@ -108,6 +100,9 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
         tag={tag}
         initialPicLists={initialPicLists}
         data={data}
+        likes={likes}
+        searchKeyword={searchKeyword}
+        setLikes={setLikes}
       />
     </StMainContainer>
   );

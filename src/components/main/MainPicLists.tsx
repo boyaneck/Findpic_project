@@ -8,7 +8,7 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { styled } from 'styled-components';
 import { fetchSearchedListByTag } from '@/pages/api/picLists';
-
+type SortedBy = 'id' | 'likes';
 const MainPicLists: React.FC<MainPicListsProps> = ({
   searchedPictures,
   setSearchedPictures,
@@ -16,69 +16,78 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
   setIsSearching,
   tag,
   initialPicLists,
-  data
+  data,
+  likes,
+  searchKeyword,
+  setLikes
 }) => {
-  console.log('initialPicLists in MainPicLists', initialPicLists);
+  //서버사이드로 부터 가져오는 데이터
+  // -------------------
+  // console.log('initialPicLists in MainPicLists', initialPicLists);
+  // ---------------------
+  //서버사이드로 부터 가져오는 데이터
   const [picLists, setPicLists] = useState<PicList[]>([]);
   const queryClient = useQueryClient();
+  const [isLikesPicsPreFetched, setIsLikesPicsPreFetched] = useState(false);
+  const [sortedBy, setSortedBy] = useState<SortedBy>('id');
+  const [isLikesClicked, setIsLikesClicked] = useState<boolean>(false);
+  const handlerFilterdLikedPics = async () => {
+    // 미리 가져오기 로직이 실행되지 않았다면 실행
+    setLikes('likes');
+    const result = await queryClient.getQueryData(['picLists', tag, searchKeyword, likes]);
+    console.log('result:', result);
+    setIsLikesClicked((prev) => !prev);
+  };
 
-  // const { isLoading, isError, data } = useQuery<PicList[]>({
-  //   queryKey: ['picLists', tag],
-  //   queryFn: (a) => {
-  //     console.log('sss', a);
-  //     return fetchSearchedListByTag(tag);
-  //   }
-  // });
-  // console.log('메롱메롱');
-  // console.log('MainpucLists에서', data);
+  console.log('과연 무슨 데이터가 /', data);
 
-  // useEffect(() => {
-  //   const fetch = async () => {
-  //     try {
-  //       const sampleCollection = collection(db, 'findpicLists');
-  //       const Snapshot = await getDocs(sampleCollection);
-  //       const responseData = Snapshot.docs.map((doc) => doc.data());
-  //       console.log('responseData in mainpiclists', responseData);
-  //       setPicLists(responseData as PicList[]);
-  //     } catch (error) {
-  //       console.log('error', error);
-  //     }
-  //   };
-  //   fetch();
-  // }, []);
   return (
-    <StListContainer>
-      {data ? (
-        <>
-          {data?.map((pic) => {
-            return (
-              <StPicture key={pic.id}>
-                <p>{pic.id}</p>
-                <p>{pic.likes}</p>
-                <p>{pic.originID}</p>
-                <p>{pic.writerID}</p>
-                <p>{pic.tags}</p>
-                <Image src={pic.imgPath} alt="" width={200} height={200} />
-              </StPicture>
-            );
-          })}
-        </>
-      ) : (
-        <>
-          {/* {initialPicLists?.map((pic) => {
-            return (
-              <StPicture key={pic.id}>
-                <p>{pic.id}</p>
-                <p>{pic.likes}</p>
-                <p>{pic.originID}</p>
-                <p>{pic.writerID}</p>
-                <p>{pic.tags.join(' /')}</p>
-              </StPicture>
-            );
-          })} */}
-        </>
-      )}
-    </StListContainer>
+    <>
+      <button onClick={handlerFilterdLikedPics}>좋아요 많은 순 으로</button>
+      <StListContainer>
+        {isLikesClicked === false ? (
+          <>
+            {data ? (
+              <StPictureCard>
+                {data?.map((pic) => {
+                  return (
+                    <StPicture key={pic.id}>
+                      <p>{pic.id}</p>
+                      <p>likes: {pic.likes}</p>
+                      <p>{pic.originID}</p>
+                      <p>{pic.writerID}</p>
+                      <p>{pic.tags}</p>
+                      <Image src={pic.imgPath} alt="" width={200} height={200} />
+                    </StPicture>
+                  );
+                })}
+              </StPictureCard>
+            ) : (
+              <>
+                <h1>점검 중입니다.</h1>
+              </>
+            )}
+          </>
+        ) : (
+          // like 활성화, data 있을때
+          // <>{data?.filter((pic) => {})}</>
+          <StPictureCard>
+            {data?.map((pic) => {
+              return (
+                <StPicture key={pic.id}>
+                  <p>{pic.id}</p>
+                  <p>likes: {pic.likes}</p>
+                  <p>{pic.originID}</p>
+                  <p>{pic.writerID}</p>
+                  <p>{pic.tags}</p>
+                  <Image src={pic.imgPath} alt="" width={200} height={200} />
+                </StPicture>
+              );
+            })}
+          </StPictureCard>
+        )}
+      </StListContainer>
+    </>
   );
 };
 
@@ -113,6 +122,11 @@ const StListContainer = styled.ul`
   flex-direction: row;
   gap: 1rem;
   justify-content: center;
+`;
+
+const StPictureCard = styled.div`
+  display: flex;
+  flex-wrap: wrap;
 `;
 
 const StPicture = styled.li`

@@ -2,24 +2,6 @@ import { db } from '@/common/firebase_hm';
 import { PicList } from '@/type/picListsType';
 import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
 
-//초기 데이터를 가져오는
-export const getPicsList = async () => {
-  const sampleCollection = collection(db, 'photos');
-  const q = query(sampleCollection, orderBy('id'), limit(5)); // 필요한 경우 정렬 방식을 지정할 수 있습니다.
-
-  try {
-    const snapshot = await getDocs(q); // query로부터 데이터를 가져옵니다.
-    const picList = snapshot.docs.map((doc) => doc.data()); // 각 문서의 데이터를 가져옵니다.
-
-    console.log(picList); // 데이터 확인을 위한 로그
-
-    return picList; // 데이터를 반환합니다.
-  } catch (error) {
-    console.error('Error getting documents: ', error);
-    throw error;
-  }
-};
-
 // 필터링하여 검색하기 (3개의 인자를 받음 :태그,검색어,좋아요)
 export const fetchSearchedListByTag = async (
   tag: string,
@@ -35,20 +17,22 @@ export const fetchSearchedListByTag = async (
 
   //   const q = query(sampleCollection, where('tags', 'array-contains', searchKeyword.toLowerCase()));
   if (keywords.length > 0) {
-    const q = query(sampleCollection, where('tags', 'array-contains-any', keywords));
+    const q = query(sampleCollection, where('tags', 'array-contains-any', keywords), limit(2));
     const Snapshot = await getDocs(q);
+
     const pictureList: PicList[] = Snapshot.docs.map((doc) => doc.data() as PicList);
     console.log('검색 결과 in picLists', pictureList);
     return pictureList;
   }
 
   //태그만 들어올때
-  if (tag) {
+  if (tag && likes === 'undefined') {
     let q;
     if (tag === 'ALL') {
+      console.log('호버시 생기는 콘솔 tag');
       q = query(sampleCollection);
     } else {
-      q = query(sampleCollection, where('tags', 'array-contains', tag));
+      q = query(sampleCollection, where('tags', 'array-contains', tag), limit(2));
     }
 
     const Snapshot = await getDocs(q);
@@ -60,21 +44,33 @@ export const fetchSearchedListByTag = async (
     return pictureList;
   }
   //좋아요만 들어왔을 때
-  if (likes) {
-    const sampleCollection = collection(db, 'photos');
-    const q = query(sampleCollection, orderBy('likes', 'desc'), limit(5));
-
-    const snapshot = await getDocs(q);
-    const picList = snapshot.docs.map((doc) => {
-      const data = doc.data() as PicList;
-      return data;
-    });
-
-    console.log('liked 필터링 ', picList); // Log to verify data
-
-    return picList;
+  if (likes === 'likes') {
+    // 검색 후, like 필터버튼 누를때
+    if (keywords.length > 0) {
+      console.log('검색+ likes:');
+      const sampleCollection = collection(db, 'photos');
+      const q = query(sampleCollection, orderBy('likes', 'desc'), limit(2));
+      const snapshot = await getDocs(q);
+      const picList = snapshot.docs.map((doc) => {
+        const data = doc.data() as PicList;
+        return data;
+      });
+      console.log('좋아요 api에서 반환하는 데이터', picList);
+      return picList;
+    } else {
+      console.log('호버시 생기는 콘솔 likes');
+      const sampleCollection = collection(db, 'photos');
+      const q = query(sampleCollection, orderBy('likes', 'desc'), limit(2));
+      const snapshot = await getDocs(q);
+      const picList = snapshot.docs.map((doc) => {
+        const data = doc.data() as PicList;
+        return data;
+      });
+      console.log('좋아요 api에서 반환하는 데이터', picList);
+      return picList;
+    }
   }
-  //일단 여기는 보류
+
   return [];
 };
 
@@ -105,18 +101,13 @@ export const fetchSearchedListByTag = async (
 
 //좋아요
 // export const filterdLikeList = async () => {
-//   const sampleCollection = collection(db, 'sample');
-//   const q = query(sampleCollection, orderBy('likes', 'desc'), limit(5));
+//   const sampleCollection = collection(db, 'photos');
+//   const q = query(sampleCollection, orderBy('likes', 'desc'), limit(3));
 
-//   try {
-//     const snapshot = await getDocs(q);
-//     const picList = snapshot.docs.map((doc) => doc.data());
+//   const snapshot = await getDocs(q);
+//   const picList = snapshot.docs.map((doc) => doc.data());
 
-//     console.log('liked 필터링 ', picList); // Log to verify data
+//   console.log('liked 필터링 ', picList); // Log to verify data
 
-//     return picList;
-//   } catch (error) {
-//     console.error('Error getting documents: ', error);
-//     throw error;
-//   }
+//   return picList;
 // };
