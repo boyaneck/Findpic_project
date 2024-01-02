@@ -34,11 +34,17 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
   // // console.log('status', status);
 
   const changeTagType = (tags: string) => {
-    if (tags === 'ALL') setTag(tags);
+    if (tags === 'ALL') {
+      setTag(tags);
+    }
     if (tags === 'dog') setTag(tags);
     if (tags === 'park') setTag(tags);
     if (tags === 'girl') setTag(tags);
-    if (tags === 'man') setTag(tags);
+    if (tags === 'man') {
+      setTag(tags);
+    }
+
+    console.log('태그 눌렀을 때 searchKeyword', searchKeyword);
     // if (tags === 'night') setTag(tags);
     // if (tags === 'sky') setTag(tags);
   };
@@ -59,9 +65,7 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     queryKey: ['picLists', tag, searchKeyword, likes],
     // 4. pageParam에 getNextPageParam의 return값이 들어온다.
     queryFn: ({ pageParam }) => {
-      console.log('pageParam in Fn', pageParam);
       // 5. fetchSearchedListByTag가 실행된다.
-      console.log('fetchSearchedListByTag가 실행되나?');
       return fetchSearchedListByTag(tag, searchKeyword, likes, pageParam);
     },
     initialPageParam: 0,
@@ -71,11 +75,13 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     getNextPageParam: (lastPage) => {
       // const lastPageParam = lastPage.data.querySnapShot.docs[querySnapShot.docs.length - 1];
       // 3. 현재 내가 가지고있는 마지막 데이터
-      console.log({ lastPage });
+      // console.log({ lastPage });
       // @ts-ignore
       return lastPage.lastVisible;
     }
   });
+
+  console.log('인덱스의 data', data);
 
   const { ref } = useInView({
     threshold: 1,

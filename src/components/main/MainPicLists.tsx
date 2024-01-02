@@ -35,11 +35,7 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
   searchKeyword,
   setLikes
 }) => {
-  //서버사이드로 부터 가져오는 데이터
-  // -------------------
-  // // console.log('initialPicLists in MainPicLists', initialPicLists);
-  // ---------------------
-  //서버사이드로 부터 가져오는 데이터
+ 
   const [picLists, setPicLists] = useState<PicList[]>([]);
   const queryClient = useQueryClient();
   const [isLikesPicsPreFetched, setIsLikesPicsPreFetched] = useState(false);
@@ -64,12 +60,11 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
     // 미리 가져오기 로직이 실행되지 않았다면 실행
     setLikes('likes');
     const result = await queryClient.getQueryData(['picLists', tag, searchKeyword, likes]);
-    // console.log('result:', result);
     setIsLikesClicked((prev) => !prev);
   };
   const { data: session, status } = useSession();
-  // // console.log('과연 무슨 데이터가 /', data);
 
+  console.log('메인픽리스트에서 데이터 보여줘', data);
   return (
     <>
       <LikeButton onClick={handlerFilterdLikedPics}>좋아요 많은 순</LikeButton>

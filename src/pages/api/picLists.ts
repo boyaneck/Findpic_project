@@ -10,37 +10,25 @@ export const fetchSearchedListByTag = async (
   pageParam: any
 ): Promise<PicList[]> => {
   const sampleCollection = collection(db, 'photos');
-
-  //   // 검색어만 들어올때-------------
+  //    검색어만 들어올때-------------
+  // tag =ALL  likes=undefined  searchKeyword = "검색어"
   const keywords = searchKeyword.toLowerCase().split(' ').filter(Boolean);
-  console.log('keyword:', keywords);
   if (keywords.length > 0) {
-    console.log('pageParam!!!', pageParam);
     const lastVisible = pageParam;
-    console.log('lastvisible', lastVisible);
+    console.log('키워드', keywords);
     let w;
     if (lastVisible === 0) {
-      w = query(sampleCollection, where('tags', 'array-contains', keywords), limit(2));
-      console.log('wwwwwwwwwwwwwwww', w);
+      w = query(sampleCollection, where('tags', 'array-contains-any', keywords), limit(2));
       alert('dul');
-    } else {
-      console.log('keywords!', keywords);
       console.log('lastvisible28', lastVisible);
-
-      w = query(sampleCollection, where('tags', 'array-contains', keywords), startAfter(lastVisible), limit(2));
+    } else {
+      w = query(sampleCollection, where('tags', 'array-contains-any', keywords), startAfter(lastVisible), limit(2));
     }
-    ////
-
-    // const q = query(sampleCollection, where('tags', 'array-contains-any', keywords), limit(2));
     const Snapshot = await getDocs(w);
-    console.log('Snapshot', Snapshot);
-
-    // const pictureList: PicList[] = Snapshot.docs.map((doc) => doc.data() as PicList);
-    // // console.log('검색 결과 in picLists', pictureList);
-    // return pictureList;
-
+    console.log('스냅샷', Snapshot.docs);
     const pictureList = Snapshot.docs.map((doc) => {
       const data = doc.data() as PicList;
+      console.log('검색했을때의 데이터 가져와 ', data);
       return data;
     });
 
@@ -49,22 +37,30 @@ export const fetchSearchedListByTag = async (
       lastVisible: Snapshot.docs[Snapshot.docs.length - 1]
     };
   }
-
+  // ---------------------------------------------------
+  // if (tag && likes === 'undefined') {
+  //   일단 먼저 말씀드리면 저 위에 부분 가정이 잘못됐어여. 태그 눌러서 검색안해도 처음에 항상 tag 는 'ALL' 이라서 안으로 들어오고 이안에서 startAfter는 lastVisible 값에 따른 분기처리를 안해놔서 생긴 오류였어여
   //태그만 들어올때-------------
-  if (tag && likes === 'undefined') {
+  //
+
+  //처음 화면을 접속했을 때 는 곳
+  if (tag === 'ALL' || likes === 'undefined' || searchKeyword === '') {
     let q;
+    console.log('검색어가눌렸을 때 여기를 들어오면 안됩니다!', searchKeyword);
+    console.log('tag', tag);
+    console.log('likes', likes);
+    console.log('searchKeyword', searchKeyword);
     if (tag === 'ALL') {
       const lastVisible = pageParam;
-      // console.log({ lastVisible });
-      console.log('lastVisible58', lastVisible);
-      const next = query(sampleCollection, orderBy('id'), startAfter(lastVisible), limit(2));
 
+      console.log('처음화면에만 들어오는 곳 ', lastVisible);
+      const next = query(sampleCollection, orderBy('id'), startAfter(lastVisible), limit(2));
+      console.log('쿼리가 실행된 ', lastVisible);
+      console.log();
       const nextresult = await getDocs(next);
-      // console.log({ docs: nextresult.docs });
-      // alert('tag 타고들어옴');
+
       const pictureList = nextresult.docs.map((doc) => {
         const data = doc.data() as PicList;
-        // // console.log('얍얍얍얍', data, '페이지파람', pageParam);
 
         return data;
       });
@@ -73,11 +69,9 @@ export const fetchSearchedListByTag = async (
         data: pictureList,
         lastVisible: nextresult.docs[nextresult.docs.length - 1]
       };
-      // q = query(sampleCollection);
     } else {
       console.log('else');
       const lastVisible = pageParam;
-      // console.log({ lastVisible });
       if (lastVisible === 0) {
         q = query(sampleCollection, where('tags', 'array-contains', tag), limit(2));
         console.log('q:', q);

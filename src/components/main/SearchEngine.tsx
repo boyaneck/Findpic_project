@@ -20,9 +20,9 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
   // const [typingKeyword, setTypingKeyword] = useState<string>('');
   const handleSubmit = async (e: React.FormEvent, typingKeyword: string) => {
     e.preventDefault();
+    let pageParam = 0;
     setSearchKeyword(typingKeyword);
-    // console.log('searchKeyword now:', searchKeyword);
-    fetchSearchedListByTag(tag, searchKeyword, likes);
+    fetchSearchedListByTag(tag, typingKeyword, likes, pageParam);
   };
 
   return (
@@ -46,6 +46,7 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
           setTypingKeyword(e.target.value);
         }}
       />
+      searchKeyword:{searchKeyword}
       {/* searchKeyword:{searchKeyword}TypingKeyword:{typingKeyword} */}
     </StSearchEngineWrapper>
   );
