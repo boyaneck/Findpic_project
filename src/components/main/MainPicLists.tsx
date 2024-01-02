@@ -18,7 +18,6 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
   initialPicLists,
   data
 }) => {
-  console.log('initialPicLists in MainPicLists', initialPicLists);
   const [picLists, setPicLists] = useState<PicList[]>([]);
   const queryClient = useQueryClient();
 

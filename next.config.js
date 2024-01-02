@@ -24,6 +24,7 @@ const nextConfig = {
     styledComponents: true
   },
   images: {
+    contentDispositionType: 'attachment',
     remotePatterns: [
       {
         protocol: 'https',
