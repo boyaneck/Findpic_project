@@ -13,7 +13,7 @@ export default function Result() {
   const [input, setInput] = useState<string>('');
   const [photos, setPhotos] = useState<[]>([]);
 
-  console.log(photos);
+  // console.log(photos);
   return (
     <ResultPageWrapper>
       <SearchFrom input={input} setInput={setInput} photos={photos} setPhotos={setPhotos} />
