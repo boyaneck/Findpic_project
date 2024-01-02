@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import { styled } from 'styled-components';
 
@@ -8,7 +9,12 @@ const Header = () => {
         <StLogoTitle>Findpic</StLogoTitle>
         <StLoginButton>
           <StGoogleLogo src="./google-logo.png" />
-          <StLogin>LOGIN</StLogin>
+          <StLogin>
+            <Link href="/api/auth/signin">Login</Link>
+          </StLogin>
+          <StLogin>
+            <Link href="/api/auth/signout">Log out</Link>
+          </StLogin>
         </StLoginButton>
       </StHeaderContentContainer>
     </StHeaderContainer>
