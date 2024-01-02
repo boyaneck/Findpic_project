@@ -46,7 +46,6 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
           setTypingKeyword(e.target.value);
         }}
       />
-      searchKeyword:{searchKeyword}
       {/* searchKeyword:{searchKeyword}TypingKeyword:{typingKeyword} */}
     </StSearchEngineWrapper>
   );
