@@ -47,6 +47,7 @@ export const fetchTagPhotoData = async (tags: string[]) => {
       limit(PAGE_SIZE)
     );
   }
+  
   const querySnapshot = await getDocs(q);
   console.log('docs is : ', querySnapshot.docs);
   const data = querySnapshot.docs.map((doc) => {
