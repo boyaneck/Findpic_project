@@ -8,32 +8,13 @@ import { styled } from 'styled-components';
 import { db } from '@/common/firebase_hm';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { PicList } from '@/type/picListsType';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchSearchedListByTag } from './api/picLists';
 import { sortedBy } from '@/type/sortedByType';
 import { InitialPicLists } from '@/type/initialPicLists';
 // import { searchByKeyword } from './api/picLists';
 import { useSession, signIn, signOut } from 'next-auth/react';
-
-//--------------------------------
-// type SortedBy = 'id' | 'downloads' | 'likes';
-
-//   const [sortedBy, setSortedBy] = useState<SortedBy>('id');
-
-// const handlerFilterdLikedPics = () => {
-//     setSortedBy('likes');
-//   };
-
-// const { data, isError, isPending } = useQuery({
-//     queryKey: ['picLists', { sortedBy }],
-//     queryFn: () => {
-//       if (sortedBy === 'id') return getPicsList();
-//       else if (sortedBy === 'likes') return filterdLikeList();
-//       else if (sortedBy === 'downloads') return filterdDownloadList();
-//
-//   });
-
-//--------------------------------
+import { useInView } from 'react-intersection-observer';
 
 // function Main<initialPicLists>() {
 function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
@@ -42,15 +23,15 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [searchedPictures, setSearchedPictures] = useState<PicList[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const TAGS: string[] = ['ALL', 'dog', 'park', 'girl', 'man', 'night', 'sky'];
+  const TAGS: string[] = ['ALL', 'dog', 'park', 'girl', 'man'];
   const [tag, setTag] = useState<sortedBy>('ALL');
   const [likes, setLikes] = useState<sortedByLike>('undefined');
   const [typingKeyword, setTypingKeyword] = useState<string>('');
 
   const { data: session, status } = useSession();
-  // console.log('session in index', session);
-  // console.log('initialPicLists', initialPicLists);
-  // console.log('status', status);
+  // // console.log('session in index', session);
+  // // console.log('initialPicLists', initialPicLists);
+  // // console.log('status', status);
 
   const changeTagType = (tags: string) => {
     if (tags === 'ALL') setTag(tags);
@@ -61,52 +42,104 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     // if (tags === 'night') setTag(tags);
     // if (tags === 'sky') setTag(tags);
   };
-  const queryClient = useQueryClient();
-  const { isLoading, isError, data } = useQuery<PicList[]>({
+
+  // -----------기존의 useQuery
+  // const queryClient = useQueryClient();
+  // const { isLoading, isError, data } = useQuery<PicList[]>({
+  //   queryKey: ['picLists', tag, searchKeyword, likes],
+  //   queryFn: (a) => {
+  //     // // console.log('sss', a);
+  //     return fetchSearchedListByTag(tag, searchKeyword, likes);
+  //   }
+  // });
+
+  //  ---------------기존의 useQuery
+
+  const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery<any[]>({
     queryKey: ['picLists', tag, searchKeyword, likes],
-    queryFn: (a) => {
-      // console.log('sss', a);
-      return fetchSearchedListByTag(tag, searchKeyword, likes);
+    // 4. pageParam에 getNextPageParam의 return값이 들어온다.
+    queryFn: ({ pageParam }) => {
+      console.log('pageParam in Fn', pageParam);
+      // 5. fetchSearchedListByTag가 실행된다.
+      console.log('fetchSearchedListByTag가 실행되나?');
+      return fetchSearchedListByTag(tag, searchKeyword, likes, pageParam);
+    },
+    initialPageParam: 0,
+
+    // 2. getNextPageParam 이 실행된다.
+    // => querySnapShot은 이전에 가지고 있던 데이터들
+    getNextPageParam: (lastPage) => {
+      // const lastPageParam = lastPage.data.querySnapShot.docs[querySnapShot.docs.length - 1];
+      // 3. 현재 내가 가지고있는 마지막 데이터
+      console.log({ lastPage });
+      // @ts-ignore
+      return lastPage.lastVisible;
     }
   });
-  //------------
-  // console.log('쿼리키에 따른 데이터 in index', data);
-  //----------------------------
+
+  const { ref } = useInView({
+    threshold: 1,
+    onChange: (inView) => {
+      // if (!inView || !hasNextPage) return;
+
+      // TODO: !hasNextPage 추가??
+      // 1. 초록색바가 보이면 fetchNextPage를 실행한다.
+      if (!inView) return;
+      console.log('fetchNextPage 실행');
+      fetchNextPage();
+    }
+  });
+
   return (
-    <StMainContainer>
-      <Header />
-      <StSearchEngineContainer>
-        <SearchEngine
+    <>
+      <StMainContainer>
+        <Header />
+        <StSearchEngineContainer>
+          <SearchEngine
+            tag={tag}
+            likes={likes}
+            searchKeyword={searchKeyword}
+            setSearchKeyword={setSearchKeyword}
+            typingKeyword={typingKeyword}
+            setTypingKeyword={setTypingKeyword}
+          />
+          <StTagContainer>
+            {TAGS.map((tag: string, index: number) => (
+              // <StTag key={index} onClick={() => fetchSearchedListByTag(tag)}>
+              <StTag key={index} onClick={() => changeTagType(tag)}>
+                # {tag}
+              </StTag>
+            ))}
+          </StTagContainer>
+        </StSearchEngineContainer>
+
+        <MainPicLists
+          searchedPictures={searchedPictures}
+          setSearchedPictures={setSearchedPictures}
+          setIsSearching={setIsSearching}
+          isSearching={isSearching}
           tag={tag}
+          initialPicLists={initialPicLists}
           likes={likes}
           searchKeyword={searchKeyword}
-          setSearchKeyword={setSearchKeyword}
-          typingKeyword={typingKeyword}
-          setTypingKeyword={setTypingKeyword}
+          setLikes={setLikes}
+          data={data?.pages.map((page) => page.data).flat()}
         />
-        <StTagContainer>
-          {TAGS.map((tag: string, index: number) => (
-            // <StTag key={index} onClick={() => fetchSearchedListByTag(tag)}>
-            <StTag key={index} onClick={() => changeTagType(tag)}>
-              # {tag}
-            </StTag>
-          ))}
-        </StTagContainer>
-      </StSearchEngineContainer>
+      </StMainContainer>
 
-      <MainPicLists
-        searchedPictures={searchedPictures}
-        setSearchedPictures={setSearchedPictures}
-        setIsSearching={setIsSearching}
-        isSearching={isSearching}
-        tag={tag}
-        initialPicLists={initialPicLists}
-        data={data}
-        likes={likes}
-        searchKeyword={searchKeyword}
-        setLikes={setLikes}
-      />
-    </StMainContainer>
+      <div
+        style={{
+          textAlign: 'center',
+          backgroundColor: 'green',
+          color: 'white',
+          width: '100%',
+          height: 50
+        }}
+        ref={ref}
+      >
+        Trigger to Fetch Here
+      </div>
+    </>
   );
 }
 
@@ -120,8 +153,8 @@ export async function getServerSideProps() {
   try {
     const Snapshot = await getDocs(q);
     const pictureList = Snapshot.docs.map((doc) => doc.data() as PicList);
-    console.log('pictureList in serversidee', pictureList);
-    console.error('pictureList in serversidee', pictureList);
+    // console.log('pictureList in serversidee', pictureList);
+    // console.error('pictureList in serversidee', pictureList);
     // 반환된 데이터를 props로 전달
     return {
       props: {
@@ -129,7 +162,7 @@ export async function getServerSideProps() {
       }
     };
   } catch (error) {
-    console.log('에러', error);
+    // console.log('에러', error);
 
     // 에러 발생 시 빈 배열을 props로 전달
     return {

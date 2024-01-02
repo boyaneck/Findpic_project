@@ -50,5 +50,5 @@ const requestOptions = {
 
 fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
   .then(response => response.text())
-  .then(result => console.log(result))
-  .catch(error => console.log('error', error));
+  .then(result => // console.log(result))
+  .catch(error => // console.log('error', error));

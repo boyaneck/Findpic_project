@@ -44,7 +44,7 @@ export default function SearchedList({ input, photos }: ListProps) {
     const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((doc) => {
-      console.log(doc.id, ' => ', doc.data());
+      // console.log(doc.id, ' => ', doc.data());
     });
   };
 
@@ -132,7 +132,7 @@ export default function SearchedList({ input, photos }: ListProps) {
 
       return data;
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
 

@@ -36,7 +36,7 @@ type Props = {
 export default function Detail({ pic, searchTagsResult, error }: Props) {
   // 로그인 유무확인 status 값으로 확인하기
   const { data: session, status } = useSession();
-  console.log('status', status);
+  // console.log('status', status);
 
   if (error) return <div>{error}</div>;
 

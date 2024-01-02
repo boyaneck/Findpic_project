@@ -37,7 +37,7 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
 }) => {
   //서버사이드로 부터 가져오는 데이터
   // -------------------
-  // console.log('initialPicLists in MainPicLists', initialPicLists);
+  // // console.log('initialPicLists in MainPicLists', initialPicLists);
   // ---------------------
   //서버사이드로 부터 가져오는 데이터
   const [picLists, setPicLists] = useState<PicList[]>([]);
@@ -64,11 +64,11 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
     // 미리 가져오기 로직이 실행되지 않았다면 실행
     setLikes('likes');
     const result = await queryClient.getQueryData(['picLists', tag, searchKeyword, likes]);
-    console.log('result:', result);
+    // console.log('result:', result);
     setIsLikesClicked((prev) => !prev);
   };
   const { data: session, status } = useSession();
-  console.log('과연 무슨 데이터가 /', data);
+  // // console.log('과연 무슨 데이터가 /', data);
 
   return (
     <>
@@ -356,11 +356,11 @@ const StAdditionalInfo = styled.div`
 //         const Snapshot = await getDocs(sampleCollection);
 //         return Snapshot.docs;
 //       } catch (error) {
-//         console.log('error를 말해', error);
+//         // console.log('error를 말해', error);
 //       }
 //     };
 //     fetch().then((res) =>
-//       console.log(
+//       // console.log(
 //         'res',
 //         res?.map((list) => list.data())
 //       )
@@ -385,7 +385,7 @@ const StAdditionalInfo = styled.div`
 //     const Snapshot = await getDocs(sampleCollection);
 //     const responseData = Snapshot.docs.map((doc) => doc.data()) as PicList[];
 
-//     console.log('responseData:', responseData);
+//     // console.log('responseData:', responseData);
 
 //     return {
 //       props: {

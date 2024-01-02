@@ -28,7 +28,7 @@ export default function MyPage() {
 
   useEffect(() => {
     getDB('cat');
-    console.log('나 실행중');
+    // console.log('나 실행중');
   }, []);
 
   return (

@@ -9,7 +9,7 @@
 //     const snapshot = await getDocs(q); // query로부터 데이터를 가져옵니다.
 //     const picList = snapshot.docs.map((doc) => doc.data()); // 각 문서의 데이터를 가져옵니다.
 
-//     console.log(picList); // 데이터 확인을 위한 로그
+//     // console.log(picList); // 데이터 확인을 위한 로그
 
 //     return picList; // 데이터를 반환합니다.
 //   } catch (error) {
@@ -26,7 +26,7 @@
 //     const snapshot = await getDocs(q);
 //     const picList = snapshot.docs.map((doc) => doc.data());
 
-//     console.log('liked 필터링 ', picList); // Log to verify data
+//     // console.log('liked 필터링 ', picList); // Log to verify data
 
 //     return picList;
 //   } catch (error) {
@@ -43,7 +43,7 @@
 //     const snapshot = await getDocs(q);
 //     const picList = snapshot.docs.map((doc) => doc.data());
 
-//     console.log('downloads 필터링 ', picList); // Log to verify data
+//     // console.log('downloads 필터링 ', picList); // Log to verify data
 
 //     return picList;
 //   } catch (error) {

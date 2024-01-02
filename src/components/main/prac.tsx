@@ -40,10 +40,10 @@
 //       setIsSearching(true);
 //       setPicLists(pictureList);
 //       setSearchedPictures(pictureList);
-//       console.log('pictureList', pictureList);
+//       // console.log('pictureList', pictureList);
 //       return pictureList;
 //     } catch (error) {
-//       console.log('error', error);
+//       // console.log('error', error);
 //       return [];
 //     }
 //   };
@@ -73,9 +73,9 @@
 
 //       setIsSearching(true);
 //       setSearchedPictures(pictureList);
-//       console.log('검색 결과', pictureList);
+//       // console.log('검색 결과', pictureList);
 //     } catch (error) {
-//       console.log('에러', error);
+//       // console.log('에러', error);
 //       setSearchedPictures([]);
 //     }
 //   };
@@ -117,7 +117,7 @@
 //   try {
 //     const Snapshot = await getDocs(q);
 //     const pictureList = Snapshot.docs.map((doc) => doc.data() as PicList);
-//     // console.log('pictureList in serversidee', pictureList);
+//     // // console.log('pictureList in serversidee', pictureList);
 //     console.error('pictureList in serversidee', pictureList);
 //     // 반환된 데이터를 props로 전달
 //     return {
@@ -126,7 +126,7 @@
 //       }
 //     };
 //   } catch (error) {
-//     console.log('에러', error);
+//     // console.log('에러', error);
 
 //     // 에러 발생 시 빈 배열을 props로 전달
 //     return {
