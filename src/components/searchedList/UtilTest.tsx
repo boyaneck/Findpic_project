@@ -1,11 +1,13 @@
 import { db } from '@/common/firebase_RK';
 import axios from 'axios';
-import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { addDoc, arrayUnion, collection, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { MouseEvent, useState } from 'react';
 import styled from 'styled-components';
 import envConfig from '../../../config';
 import { nanoid } from '@reduxjs/toolkit';
+import { useSession } from 'next-auth/react';
+import CardSkeleton from '@/components/skeleton/Skeleton';
 
 type ListProps = {
   input: string;
@@ -18,6 +20,8 @@ type ListProps = {
     tags: { title: string }[];
     links: { download: string; download_location: string };
   }[];
+  setPhotos: React.Dispatch<React.SetStateAction<any[]>>;
+  isLoading: boolean;
 };
 
 type fetchedItem = {
@@ -34,7 +38,9 @@ type fetchedItem = {
   user_id: string;
 };
 
-export default function SearchedList({ input, photos }: ListProps) {
+export default function SearchedList({ input, photos, setPhotos, isLoading }: ListProps) {
+  const { data: session } = useSession();
+  const user = session?.user;
   const [data, setData] = useState<any>([]);
 
   // 검색 테스트
@@ -164,12 +170,6 @@ export default function SearchedList({ input, photos }: ListProps) {
     await setDB(newData);
   };
 
-  useEffect(() => {
-    // getUnsplash();
-    // getPixabay();
-    // getDB('dog');
-  }, []);
-
   // Pixabay 데이터 가져와서 가공 후 저장하는 함수
   const getPixabay = async () => {
     const res = await axios.get(`https://pixabay.com/api?page=27&key=${process.env.NEXT_PUBLIC_PIXABAY_API_KEY}`);
@@ -189,29 +189,58 @@ export default function SearchedList({ input, photos }: ListProps) {
     setDB(procced);
   };
 
+  // 좋아요 기능
+  const likePic = async (e: MouseEvent<HTMLElement>) => {
+    // 좋아요 누른 이미지 id 확인
+    const likedImg = e.currentTarget.id;
+    console.log(likedImg);
+    // db에서 로그인 된 유저 데이터 찾아서 liked에 이미지 id 추가
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('email', '==', user?.email));
+
+    const currentUser: any = await getDocs(q);
+    currentUser.forEach(async (doc: any) => {
+      console.log(doc.ref);
+      await updateDoc(doc.ref, { liked: arrayUnion(`${likedImg}`) });
+    });
+  };
+
+  const skeletonArray = [0, 1, 2, 3, 4, 5, 6, 7];
+  const skeletonGrid = skeletonArray.map((_, i) => {
+    return <CardSkeleton key={i}></CardSkeleton>;
+  });
+
   return (
     <StListContainer>
-      {photos?.map((item) => {
-        return (
-          <StListCard key={item.id}>
-            <StImageEl width={1000} height={1000} src={`${item.urls.raw}`} alt="test2" />
-            <StCardHover>
-              <StHoverWrapper>
-                <StHoverUserInfo>
-                  <StHoverUserIcon></StHoverUserIcon>
-                  <StHoverUserName>{item.user?.name}</StHoverUserName>
-                </StHoverUserInfo>
-                <StHoverTagBox>
-                  <StHoverTags>
-                    {item.tags.map((tag) => (
-                      <StTagEl key={tag.title}># {tag.title}</StTagEl>
-                    ))}
-                  </StHoverTags>
-                </StHoverTagBox>
-              </StHoverWrapper>
-            </StCardHover>
-          </StListCard>
-        );
+      {photos?.map((item: any) => {
+        if (!isLoading)
+          return (
+            <>
+              <StListCard key={item.id}>
+                <StImageEl width={400} height={400} src={`${item.imgPath}`} alt="test2" loading="lazy" />
+
+                <StCardHover>
+                  <StHoverWrapper>
+                    <StHoverUserInfo>
+                      <StHoverUserIcon></StHoverUserIcon>
+                      <StHoverUserName>{item.user?.name}</StHoverUserName>
+                    </StHoverUserInfo>
+                    <StHoverTagBox>
+                      <StHoverTags>
+                        {item.tags.slice(0, 4).map((tag: any) => (
+                          <StTagEl key={tag.title}># {tag}</StTagEl>
+                        ))}
+                      </StHoverTags>
+                    </StHoverTagBox>
+                  </StHoverWrapper>
+                </StCardHover>
+                <StLikeButton id={item.id} onClick={likePic}>
+                  좋아요
+                </StLikeButton>
+              </StListCard>
+            </>
+          );
+        else return <StListContainer>{skeletonGrid}</StListContainer>;
       })}
     </StListContainer>
   );
@@ -328,4 +357,12 @@ const StImageEl = styled(Image)`
   height: 100%;
   object-fit: cover;
   border-radius: 9px;
+`;
+
+const StLikeButton = styled.div`
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 2%;
+  right: 4%;
 `;

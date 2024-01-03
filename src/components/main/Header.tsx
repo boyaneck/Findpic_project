@@ -1,23 +1,58 @@
+import Link from 'next/link';
 import React from 'react';
 import { styled } from 'styled-components';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useSearchContext } from '@/context/keyword';
 
 const Header = () => {
   const { data: session } = useSession();
+  const router = useRouter();
+  const { searchKeyword, setSearchKeyword } = useSearchContext();
+
+  const handleLogoClick = () => {
+    setSearchKeyword('');
+    // setSearchValue(''); // 로고 클릭 시 검색값 초기화
+    // router.push('/');
+  };
   // // console.log('session in Header', session);
+
+  const handleLogin = async () => {
+    try {
+      await signIn('google', { callbackUrl: 'http://localhost:3000' });
+    } catch (error) {
+      alert('로그인에 실패하였습니다.');
+    }
+  };
+
+  const handleLogout = () => {
+    const confirmLogout = window.confirm('로그아웃 하시겠습니까?');
+    if (confirmLogout) {
+      signOut();
+      alert('로그아웃이 완료되었습니다.');
+    }
+  };
+
   return (
     <StHeaderContainer>
       <StHeaderContentContainer>
-        <StLogoTitle>Findpic</StLogoTitle>
+        <Link href={'/'} passHref>
+          <StLogoTitle
+            onClick={() => {
+              handleLogoClick();
+            }}
+          >
+            Findpic
+          </StLogoTitle>
+        </Link>
         <StLoginContainer>
           <StLoginButton>
-            <StGoogleLogo src="./google-logo.png" />
+            <StGoogleLogo src="/google-logo.png" />
             {!session ? (
-              <StLogin onClick={() => signIn('google', { callbackUrl: 'http://localhost:3000' })}>LOGIN</StLogin>
+              <StLogin onClick={handleLogin}>LOGIN</StLogin>
             ) : (
-              <StLogin onClick={() => signOut()}>LOGOUT</StLogin>
+              <StLogin onClick={handleLogout}>LOGOUT</StLogin>
             )}
           </StLoginButton>
           {session?.user?.image && (
@@ -44,6 +79,7 @@ const StHeaderContainer = styled.div`
   justify-content: center;
   align-items: center;
   background-color: white;
+  border: 1px solid #f7f3f3;
 `;
 
 const StLoginContainer = styled.div`
@@ -55,8 +91,8 @@ const StLoginContainer = styled.div`
 `;
 
 const StUserImage = styled(Image)`
-  width: 3rem;
-  height: 3rem;
+  width: 2.8rem;
+  height: 2.8rem;
   border-radius: 10rem;
   // border: 1px solid red;
 `;

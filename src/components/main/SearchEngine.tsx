@@ -1,16 +1,18 @@
 import { fetchSearchedListByTag } from '@/pages/api/picLists';
 import { SearchEngineProps } from '@/type/searchEnginePropsType';
 import React, { useState } from 'react';
+import { useSearchContext } from '@/context/keyword';
 import { styled } from 'styled-components';
 
 const SearchEngine: React.FC<SearchEngineProps> = ({
-  searchKeyword,
-  setSearchKeyword,
+  // searchKeyword,
+  // setSearchKeyword,
   likes,
   tag,
   typingKeyword,
   setTypingKeyword
 }) => {
+  const { searchKeyword, setSearchKeyword } = useSearchContext();
   // const handleSubmit = async (e: React.FormEvent) => {
   //   e.preventDefault();
   //   if (searchKeyword.trim() !== '') {
@@ -23,6 +25,7 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
     let pageParam = 0;
     setSearchKeyword(typingKeyword);
     fetchSearchedListByTag(tag, typingKeyword, likes, pageParam);
+    setTypingKeyword('');
   };
 
   return (

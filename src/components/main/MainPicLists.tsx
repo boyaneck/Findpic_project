@@ -1,15 +1,20 @@
-import { db } from '@/common/firebase_hm';
+import { db } from '@/common/firebase_RK';
 import { MainPicListsProps } from '@/type/mainPicListsPropsType';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { PicList } from '@/type/picListsType';
-import { collection, getDocs } from 'firebase/firestore';
+import { arrayUnion, collection, getDocs, query, updateDoc, where, arrayRemove } from 'firebase/firestore';
 import { GetServerSideProps } from 'next';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { fetchSearchedListByTag } from '@/pages/api/picLists';
 import { useSession } from 'next-auth/react';
 import styled, { keyframes } from 'styled-components';
-
+import Link from 'next/link';
+import 'react-loading-skeleton/dist/skeleton.css';
+import { SkeletonTheme } from 'react-loading-skeleton';
+import Skeleton from 'react-loading-skeleton';
+import CardSkeleton from './CardSkeleton';
+import { useInfiniteQuery } from '@tanstack/react-query';
 type SortedBy = 'id' | 'likes';
 
 const likeAnimation = keyframes`
@@ -35,39 +40,101 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
   searchKeyword,
   setLikes
 }) => {
- 
   const [picLists, setPicLists] = useState<PicList[]>([]);
   const queryClient = useQueryClient();
+  const { isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery<any[]>({
+    queryKey: ['picLists', tag, searchKeyword, likes],
+    // 4. pageParam에 getNextPageParam의 return값이 들어온다.
+    queryFn: ({ pageParam }): any => {
+      // 5. fetchSearchedListByTag가 실행된다.
+      return fetchSearchedListByTag(tag, searchKeyword, likes, pageParam);
+    },
+    initialPageParam: 0,
+
+    // 2. getNextPageParam 이 실행된다.
+    // => querySnapShot은 이전에 가지고 있던 데이터들
+    getNextPageParam: (lastPage) => {
+      // 3. 현재 내가 가지고있는 마지막 데이터
+
+      // @ts-ignore
+      return lastPage.lastVisible;
+    }
+  });
   const [isLikesPicsPreFetched, setIsLikesPicsPreFetched] = useState(false);
   const [sortedBy, setSortedBy] = useState<SortedBy>('id');
   const [isLikesClicked, setIsLikesClicked] = useState<boolean>(false);
   const [likedPics, setLikedPics] = useState<string[]>([]); // 좋아요한 사진 ID 목록을 추적하는 상태
+  const { data: session } = useSession();
+  const user = session?.user?.email;
 
   // 테스트코드
-  const handleLikeClick = (picId: string) => {
+  const handleLikeClick = async (picId: string) => {
     // 현재 사진이 좋아요되어 있는지 확인
-    const isLiked = likedPics.includes(picId);
+    const isLiked = likedPics.includes(picId); // include 되어있으면 true
 
     // 좋아요 토글 (좋아요되어 있으면 제거, 아니면 추가)
     if (isLiked) {
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('email', '==', user));
+
+      const userData = await getDocs(q);
+      userData.forEach(async (data) => {
+        const modifiedData = data.data(); // userData
+        console.log('modifiedData', modifiedData);
+        const changed = { ...modifiedData, liked: modifiedData.liked.filter((id: string) => id !== picId) };
+        console.log('changed', changed);
+        await updateDoc(data.ref, { liked: changed.liked });
+      });
+
       setLikedPics((prev) => prev.filter((id) => id !== picId));
+      getUserData();
     } else {
+      // db에서 로그인 된 유저 데이터 찾아서 liked에 이미지 id 추가
+      const usersRef = collection(db, 'users');
+
+      const q = query(usersRef, where('email', '==', user));
+
+      // 현재 user의 데이터를 가져옴
+      const currentUser: any = await getDocs(q);
+      currentUser.forEach(async (doc: any) => {
+        await updateDoc(doc.ref, { liked: arrayUnion(`${picId}`) });
+      });
+
       setLikedPics((prev) => [...prev, picId]);
+      getUserData();
     }
   };
 
-  const handlerFilterdLikedPics = async () => {
-    // 미리 가져오기 로직이 실행되지 않았다면 실행
-    setLikes('likes');
-    const result = await queryClient.getQueryData(['picLists', tag, searchKeyword, likes]);
-    setIsLikesClicked((prev) => !prev);
-  };
-  const { data: session, status } = useSession();
+  // const handlerFilterdLikedPics = async () => {
+  //   // 미리 가져오기 로직이 실행되지 않았다면 실행
+  //   setLikes('likes');
+  //   const result = await queryClient.getQueryData(['picLists', tag, searchKeyword, likes]);
+  //   setIsLikesClicked((prev) => !prev);
+  // };
 
   console.log('메인픽리스트에서 데이터 보여줘', data);
+
+  // 메인페이지 로드 시 로그인 된 유저의 정보를 가져와 좋아요 목록 동기화
+  const getUserData = async () => {
+    const userRef = collection(db, 'users');
+    const q = query(userRef, where('email', '==', user)); // user가 undefined였음
+    const UserData = await getDocs(q);
+    UserData.forEach((data) => {
+      const user = data.data();
+      setLikedPics([...user.liked]);
+    });
+  };
+
+  useEffect(() => {
+    if (user && session) {
+      getUserData();
+    }
+  }, [user, session]);
+  const arr = ['123', '3445', 'aaa'];
+
   return (
     <>
-      <LikeButton onClick={handlerFilterdLikedPics}>좋아요 많은 순</LikeButton>
+      {/* <LikeButton onClick={handlerFilterdLikedPics}>좋아요 많은 순</LikeButton> */}
       <StListContainer>
         {isLikesClicked === false ? (
           <StPictureCardContainer>
@@ -76,6 +143,8 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
                 {data?.map((pic) => {
                   return (
                     <StPicture key={pic.id}>
+                      {/* 이미지가 없으면 ->스켈레톤이 보이도록... */}
+
                       <StLikeWrapper>
                         {likedPics.includes(pic.id) ? (
                           <StLikeImage
@@ -83,7 +152,7 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
                             alt="after like"
                             width={40}
                             height={40}
-                            onClick={() => handleLikeClick(pic.id)}
+                            onClick={() => handleLikeClick(pic.id ? pic.id : '')}
                           />
                         ) : (
                           <StAfterLikeImage
@@ -95,16 +164,14 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
                           />
                         )}
                       </StLikeWrapper>
-                      <StImage src={pic.imgPath} alt="picture" width={250} height={200} />
+                      <Link href={`/detail/${pic.id}`}>
+                        <StImage src={pic.imgPath} alt="picture" width={250} height={200} />
+                      </Link>
+
                       <StAdditionalInfo>
                         <StInfoContainer>
-                          {/* <p>{pic.originID}</p> */}
-                          <StWriterInfo>
-                            <Image src="/default_profile_image.png" alt="작가 프로필 이미지" width={40} height={40} />
-                            <p>{pic.writerID}</p>
-                          </StWriterInfo>
                           <StTagsInfo>
-                            <p> #{pic.tags.join(' #')}</p>
+                            <p> #{pic.tags?.join(' #')}</p>
                           </StTagsInfo>
                         </StInfoContainer>
                       </StAdditionalInfo>
@@ -113,9 +180,13 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
                 })}
               </StPictureCard>
             ) : (
-              <>
-                <h1>점검 중입니다.</h1>
-              </>
+              //네 락균님 ,,음 ... 👍👍👍👍!!
+              <div style={{ display: 'flex', padding: '1rem 0', gap: '1rem' }}>
+                <CardSkeleton cards={4} />
+                {/* <SkeletonTheme baseColor="#202020" highlightColor="#444">
+                  <Skeleton count={4} />
+                </SkeletonTheme> */}
+              </div>
             )}
           </StPictureCardContainer>
         ) : (
@@ -124,40 +195,42 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
           <StPictureCard>
             {data?.map((pic) => {
               return (
-                <StPicture key={pic.id}>
-                  <StLikeWrapper>
-                    {likedPics.includes(pic.id) ? (
-                      <StLikeImage
-                        src="/like_red.png"
-                        alt="after like"
-                        width={40}
-                        height={40}
-                        onClick={() => handleLikeClick(pic.id)}
-                      />
-                    ) : (
-                      <StAfterLikeImage
-                        src="/like_gray.png"
-                        alt="like"
-                        width={40}
-                        height={40}
-                        onClick={() => handleLikeClick(pic.id)}
-                      />
-                    )}
-                  </StLikeWrapper>
-                  <StImage src={pic.imgPath} alt="picture" width={250} height={200} />
-                  <StAdditionalInfo>
-                    <StInfoContainer>
-                      {/* <p>{pic.originID}</p> */}
-                      <StWriterInfo>
-                        <Image src="/default_profile_image.png" alt="작가 프로필 이미지" width={40} height={40} />
-                        <p>{pic.writerID}</p>
-                      </StWriterInfo>
-                      <StTagsInfo>
-                        <p> #{pic.tags.join(' #')}</p>
-                      </StTagsInfo>
-                    </StInfoContainer>
-                  </StAdditionalInfo>
-                </StPicture>
+                <>
+                  <StPicture key={pic.id}>
+                    <StLikeWrapper>
+                      {likedPics.includes(pic.id) ? (
+                        <StLikeImage
+                          src="/like_red.png"
+                          alt="after like"
+                          width={40}
+                          height={40}
+                          onClick={() => handleLikeClick(pic.id ? pic.id : '')}
+                        />
+                      ) : (
+                        <StAfterLikeImage
+                          src="/like_gray.png"
+                          alt="like"
+                          width={40}
+                          height={40}
+                          onClick={() => handleLikeClick(pic.id)}
+                        />
+                      )}
+                    </StLikeWrapper>
+                    <div>
+                      sss
+                      <Link href={`/detail/${pic.id}`}>
+                        <StImage src={pic.imgPath} alt="picture" width={250} height={200} />
+                      </Link>
+                    </div>
+                    <StAdditionalInfo>
+                      <StInfoContainer>
+                        <StTagsInfo>
+                          <p> #{pic.tags.join(' #')}</p>
+                        </StTagsInfo>
+                      </StInfoContainer>
+                    </StAdditionalInfo>
+                  </StPicture>
+                </>
               );
             })}
           </StPictureCard>
@@ -195,6 +268,7 @@ const StTagsInfo = styled.div`
   gap: 4px;
   p {
     margin: 0;
+    font-size: 0.1rem;
   }
 `;
 const StListContainer = styled.ul`
@@ -258,7 +332,7 @@ const StInfoContainer = styled.div`
   p:first-child {
     margin-left: 0.3rem;
     margin-top: 0.3rem;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 `;
 const StWriterInfo = styled.div`
@@ -267,7 +341,7 @@ const StWriterInfo = styled.div`
   justify-content: flex-start;
   align-items: center;
   gap: 0;
-  font-size: 1rem;
+  font-size: 1.1rem;
   p {
     margin-top: 0.5rem;
   }

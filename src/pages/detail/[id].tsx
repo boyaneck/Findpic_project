@@ -1,16 +1,21 @@
 import React from 'react';
 import styled from 'styled-components';
-import { fetchGetPhotoData, fetchTagPhotoData } from '../api/photoFind';
+import { fetchGetPhotoData, fetchPhotoDatabyPage, fetchTagPhotoData } from '../api/photoFind';
 import { GetServerSideProps } from 'next';
 import ImgZoom from '@/components/Detail/ImgZoom';
 import { FirebasePhotoData } from '@/type/firebaseDataType';
 import Image from 'next/image';
+import downloadImage from '../../../utils/downloadImage';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
+import PhotoList from '@/components/Detail/PhotoList';
+// import PhotoList from '@/components/Detail/photoList';
+
+// http://localhost:3000/detail/UOrBkUP_6CgEwDE6tAvvM
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const query = context.query;
   const id = query.id;
-
   try {
     const pic = await fetchGetPhotoData(id!);
     if (!pic) {
@@ -45,49 +50,145 @@ export default function Detail({ pic, searchTagsResult, error }: Props) {
   }
 
   return (
-    <StContainer>
+    <StPageFrame>
       <StImgContainer>
-        <StImg>
-          <ImgZoom src={pic.imgPath} />
-        </StImg>
-        <div>
-          <a download href="ImageDownload">
+        <ImgZoom src={pic.imgPath} />
+        <StDownLoadContainer>
+          <StLike>
+            <p>♥️ {pic.likes}</p>
+          </StLike>
+          <button
+            onClick={() => {
+              const imageUrl = `${pic.imgPath}`;
+              const imageName = 'find_pic.png';
+              downloadImage(imageUrl, imageName);
+            }}
+          >
             다운로드
-          </a>
-          <div>
-            <span>{pic.likes}</span>
-          </div>
-        </div>
+          </button>
+        </StDownLoadContainer>
       </StImgContainer>
-      <StTags>
-        {pic.tags.map((tag, index) => {
-          return <p key={tag + index}>{tag}</p>;
-        })}
-      </StTags>
-      <div>
-        <h4>관련사진</h4>
-        {searchTagsResult?.map((item, idx) => {
-          return <Image key={idx} src={item.imgPath} alt="" width={100} height={100} />;
-        })}
-      </div>
-    </StContainer>
+      <StTagContainer>
+        <h3># 관련 태그</h3>
+        <StTags>
+          {pic.tags.map((tag, index) => {
+            return <p key={tag + index}>{tag}</p>;
+          })}
+        </StTags>
+      </StTagContainer>
+      <StMorePictureContainer>
+        <h3># 더 많은 사진 보기</h3>
+        {/* // 컴포넌트 하나 만들어서 빼서 그 부분이 무한 스크롤 되도록 // client component를 하나 만든다 */}
+        <PhotoList searchTags={pic.tags} />
+      </StMorePictureContainer>
+    </StPageFrame>
   );
 }
 
-const StContainer = styled.div`
-  max-width: 1440px;
-  margin: 0 auto;
+const StPageFrame = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const StDownLoadContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: flex-end;
+  align-items: center;
+  width: 99%;
+  margin: auto;
+  button {
+    width: 7rem;
+    height: 3rem;
+    border-radius: 10px;
+    border: none;
+    background-color: black;
+    color: white;
+    margin: 0.3rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-wieght: 700;
+    transition: background-color 0.3s ease; /* 트랜지션 속성 추가 */
+    &:hover {
+      background-color: #339966; /* 원하는 호버 색상으로 변경 */
+      color: white; /* 원하는 호버 텍스트 색상으로 변경 */
+    }
+  }
+`;
+
+const StLike = styled.div`
+  p {
+    font-size: 1.5rem;
+  }
 `;
 
 const StImgContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-gap: 0.5rem; /* 이미지 간격 조절 */
+  flex-wrap: wrap;
+  margin: auto;
 `;
 
 const StImg = styled.div`
   width: 20rem;
 `;
 
+const StTagContainer = styled.div`
+  margin-bottom: 1rem;
+  width: 65%;
+  max-height: 600px; /* 최대 높이 설정 */
+  overflow: hidden; /* 넘치는 부분 숨기기 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+  h3 {
+    align-self: flex-start;
+    margin: 0.1rem 1rem 1rem 0.5rem;
+  }
+  flex-wrap: wrap;
+`;
+
 const StTags = styled.div`
   display: flex;
+  gap: 10px;
+  width: 100%;
+  flex-wrap: wrap;
+
+  p {
+    color: gray;
+    text-align: center;
+    width: 7.3rem;
+    height: 2rem;
+    word-wrap: break-word;
+    background-color: white;
+    border-radius: 7px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 2px 0 10px -5px gray, -2px 0 12px -10px gray;
+    transition: box-shadow 0.25s ease-in-out;
+    &:hover {
+      box-shadow: 8px 0 12px -5px gray, -8px 0 12px -5px gray;
+    }
+  }
+`;
+
+const StMorePictureContainer = styled.div`
+  width: 65%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+  h3 {
+    align-self: flex-start;
+    margin: 1rem 1rem 1rem 0.5rem;
+  }
+  flex-wrap: wrap;
 `;

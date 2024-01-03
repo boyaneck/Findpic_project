@@ -1,5 +1,4 @@
 import { Inter } from 'next/font/google';
-const inter = Inter({ subsets: ['latin'] });
 import Header from '@/components/main/Header';
 import MainPicLists from '@/components/main/MainPicLists';
 import SearchEngine from '@/components/main/SearchEngine';
@@ -15,23 +14,25 @@ import { InitialPicLists } from '@/type/initialPicLists';
 // import { searchByKeyword } from './api/picLists';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useInView } from 'react-intersection-observer';
+import { useSearchContext } from '@/context/keyword';
+import { SkeletonTheme } from 'react-loading-skeleton';
+import Skeleton from 'react-loading-skeleton';
+
+const inter = Inter({ subsets: ['latin'] });
 
 // function Main<initialPicLists>() {
 function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
   const [picLists, setPicLists] = useState<PicList[]>();
 
-  const [searchKeyword, setSearchKeyword] = useState<string>('');
+  // const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [searchedPictures, setSearchedPictures] = useState<PicList[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const TAGS: string[] = ['ALL', 'dog', 'park', 'girl', 'man'];
   const [tag, setTag] = useState<sortedBy>('ALL');
   const [likes, setLikes] = useState<sortedByLike>('undefined');
   const [typingKeyword, setTypingKeyword] = useState<string>('');
-
+  const { searchKeyword, setSearchKeyword } = useSearchContext();
   const { data: session, status } = useSession();
-  // // console.log('session in index', session);
-  // // console.log('initialPicLists', initialPicLists);
-  // // console.log('status', status);
 
   const changeTagType = (tags: string) => {
     if (tags === 'ALL') {
@@ -45,26 +46,19 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     }
 
     console.log('태그 눌렀을 때 searchKeyword', searchKeyword);
-    // if (tags === 'night') setTag(tags);
-    // if (tags === 'sky') setTag(tags);
   };
 
-  // -----------기존의 useQuery
-  // const queryClient = useQueryClient();
-  // const { isLoading, isError, data } = useQuery<PicList[]>({
-  //   queryKey: ['picLists', tag, searchKeyword, likes],
-  //   queryFn: (a) => {
-  //     // // console.log('sss', a);
-  //     return fetchSearchedListByTag(tag, searchKeyword, likes);
-  //   }
-  // });
-
-  //  ---------------기존의 useQuery
+  type paramType = {
+    tag: string;
+    searchKeyword: string;
+    pageParam: number;
+    likes: string;
+  };
 
   const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery<any[]>({
     queryKey: ['picLists', tag, searchKeyword, likes],
     // 4. pageParam에 getNextPageParam의 return값이 들어온다.
-    queryFn: ({ pageParam }) => {
+    queryFn: ({ pageParam }): any => {
       // 5. fetchSearchedListByTag가 실행된다.
       return fetchSearchedListByTag(tag, searchKeyword, likes, pageParam);
     },
@@ -73,9 +67,8 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     // 2. getNextPageParam 이 실행된다.
     // => querySnapShot은 이전에 가지고 있던 데이터들
     getNextPageParam: (lastPage) => {
-      // const lastPageParam = lastPage.data.querySnapShot.docs[querySnapShot.docs.length - 1];
       // 3. 현재 내가 가지고있는 마지막 데이터
-      // console.log({ lastPage });
+
       // @ts-ignore
       return lastPage.lastVisible;
     }
@@ -99,16 +92,9 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
   return (
     <>
       <StMainContainer>
-        <Header />
+        {/* <Header /> */}
         <StSearchEngineContainer>
-          <SearchEngine
-            tag={tag}
-            likes={likes}
-            searchKeyword={searchKeyword}
-            setSearchKeyword={setSearchKeyword}
-            typingKeyword={typingKeyword}
-            setTypingKeyword={setTypingKeyword}
-          />
+          <SearchEngine tag={tag} likes={likes} typingKeyword={typingKeyword} setTypingKeyword={setTypingKeyword} />
           <StTagContainer>
             {TAGS.map((tag: string, index: number) => (
               // <StTag key={index} onClick={() => fetchSearchedListByTag(tag)}>
@@ -118,7 +104,6 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
             ))}
           </StTagContainer>
         </StSearchEngineContainer>
-
         <MainPicLists
           searchedPictures={searchedPictures}
           setSearchedPictures={setSearchedPictures}
@@ -129,21 +114,20 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
           likes={likes}
           searchKeyword={searchKeyword}
           setLikes={setLikes}
-          data={data?.pages.map((page) => page.data).flat()}
+          data={data?.pages.map((page: any) => page.data).flat()}
         />
       </StMainContainer>
-
       <div
         style={{
           textAlign: 'center',
-          backgroundColor: 'green',
+          backgroundColor: 'black',
           color: 'white',
           width: '100%',
           height: 50
         }}
         ref={ref}
       >
-        Trigger to Fetch Here
+        {/* Trigger to Fetch Here */}
       </div>
     </>
   );
@@ -153,7 +137,7 @@ export default Main;
 
 // 페이지가 서버에서 렌더링될 때 한 번 실행되어 초기 데이터를 가져와 페이지에 주입
 export async function getServerSideProps() {
-  const sampleCollection = collection(db, 'photos');
+  const sampleCollection = collection(db, 'datas');
   const q = query(sampleCollection);
 
   try {
@@ -185,9 +169,10 @@ const StMainContainer = styled.div`
 `;
 
 const StTagContainer = styled.ul`
-  margin-top: 1.5rem;
+  margin-top: 0.9rem;
   width: 35rem;
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 6px;
   padding: 0;

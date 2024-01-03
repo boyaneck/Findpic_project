@@ -17,6 +17,13 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "caption.js"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "caption.js",
+    "src/pages/signtest/sign.jsx",
+    "src/pages/signtest/sign.jsx"
+  ],
   "exclude": ["node_modules"]
 }

@@ -1,5 +1,5 @@
-import SearchFrom from '@/components/searchForm/SearchForm';
-import SearchedList from '@/components/searchedList/SearchedList';
+import SearchFrom from '@/components/searchForm/SetDBTest';
+import SearchedList from '@/components/searchedList/UtilTest';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
@@ -11,13 +11,13 @@ const ResultPageWrapper = styled.section`
 
 export default function Result() {
   const [input, setInput] = useState<string>('');
-  const [photos, setPhotos] = useState<[]>([]);
+  const [photos, setPhotos] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // console.log(photos);
   return (
     <ResultPageWrapper>
-      <SearchFrom input={input} setInput={setInput} photos={photos} setPhotos={setPhotos} />
-      <SearchedList input={input} photos={photos} />
+      <SearchFrom input={input} setInput={setInput} photos={photos} setPhotos={setPhotos} setIsLoading={setIsLoading} />
+      <SearchedList input={input} photos={photos} setPhotos={setPhotos} isLoading={isLoading} />
     </ResultPageWrapper>
   );
 }
