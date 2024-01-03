@@ -12,9 +12,9 @@
 이하민, 박유나, 진민용, 이락균
 
 ## Technology implemented by each individual
-이하민 : 로그인, 메인페이지 검색기능, 메인페이지 세부필터기능 
-박유나 : 상세페이지, 무한스크롤
-진민용 : 메인페이지 prefetch, 좋아요, 무한스크롤링 
+이하민 : 로그인, 메인페이지 검색기능, 메인페이지 세부필터기능 </br>
+박유나 : 상세페이지, 무한스크롤</br>
+진민용 : 메인페이지 prefetch, 좋아요, 무한스크롤링 </br>
 이락균 : 마이페이지, api communication, 데이터 가공 후 firebase communication
 
 ## Period
