@@ -1,8 +1,7 @@
 # Findpic_project
-[Findpic](https://findpic-project.vercel.app/)
 
 ## Distribution
-자유 프로젝트
+[Findpic](https://findpic-project.vercel.app/)
 
 ## Together(Outsourcing Project)
 대표적인 무료 사진 스톡 서비스를 한 눈에 모아 보여주는 서비스
