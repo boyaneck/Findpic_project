@@ -83,9 +83,7 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
         const userData = await getDocs(q);
         userData.forEach(async (data) => {
           const modifiedData = data.data(); // userData
-          console.log('modifiedData', modifiedData);
           const changed = { ...modifiedData, liked: modifiedData.liked.filter((id: string) => id !== picId) };
-          console.log('changed', changed);
           await updateDoc(data.ref, { liked: changed.liked });
         });
 
@@ -122,15 +120,6 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
       }
     }
   };
-
-  // const handlerFilterdLikedPics = async () => {
-  //   // 미리 가져오기 로직이 실행되지 않았다면 실행
-  //   setLikes('likes');
-  //   const result = await queryClient.getQueryData(['picLists', tag, searchKeyword, likes]);
-  //   setIsLikesClicked((prev) => !prev);
-  // };
-
-  console.log('메인픽리스트에서 데이터 보여줘', data);
 
   // 메인페이지 로드 시 로그인 된 유저의 정보를 가져와 좋아요 목록 동기화
   const getUserData = async () => {
@@ -434,63 +423,3 @@ const StAdditionalInfo = styled.div`
     opacity: 1;
   }
 `;
-
-// import { db } from '../../common/firebase.my';
-// import { Firestore, collection, doc, getDoc, getDocs } from 'firebase/firestore';
-// import * as S from '../../styles/Main.style';
-// import React, { useEffect, useState } from 'react';
-
-// const MainPicLists = () => {
-//   const [piclists, setPicLists] = useState([]);
-//   useEffect(() => {
-//     const fetch = async () => {
-//       try {
-//         const sampleCollection = collection(db, 'sample');
-//         const Snapshot = await getDocs(sampleCollection);
-//         return Snapshot.docs;
-//       } catch (error) {
-//         // console.log('error를 말해', error);
-//       }
-//     };
-//     fetch().then((res) =>
-//       // console.log(
-//         'res',
-//         res?.map((list) => list.data())
-//       )
-//     );
-//   }, []);
-
-//   return (
-//     <>
-//       <S.FILTER_BUTTON_WRAPPER>
-//         <S.FILTER_BUTTON>다운로드 많은순</S.FILTER_BUTTON>
-//         <S.FILTER_BUTTON>좋아요 많은 순 </S.FILTER_BUTTON>
-//       </S.FILTER_BUTTON_WRAPPER>
-//     </>
-//   );
-// };
-
-// export default MainPicLists;
-
-// export const getServerSideProps: GetServerSideProps<MainProps> = async () => {
-//   try {
-//     const sampleCollection = collection(db, 'findpicLists');
-//     const Snapshot = await getDocs(sampleCollection);
-//     const responseData = Snapshot.docs.map((doc) => doc.data()) as PicList[];
-
-//     // console.log('responseData:', responseData);
-
-//     return {
-//       props: {
-//         initialPicLists: responseData
-//       }
-//     };
-//   } catch (error) {
-//     console.error('Error fetching data:', error);
-//     return {
-//       props: {
-//         initialPicLists: []
-//       }
-//     };
-//   }
-//

@@ -46,8 +46,6 @@ export default function PhotoList({ searchTags }: Props) {
     };
   }, [hasNextPage, fetchNextPage]);
 
-  console.log(queryPage);
-
   if (error) console.log('error = ', error);
   return (
     <StImgContainer style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}>

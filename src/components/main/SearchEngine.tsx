@@ -13,13 +13,6 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
   setTypingKeyword
 }) => {
   const { searchKeyword, setSearchKeyword } = useSearchContext();
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (searchKeyword.trim() !== '') {
-  //     await fetchSearchedListByTag(tag, searchKeyword, likes);
-  //   }
-  // };
-  // const [typingKeyword, setTypingKeyword] = useState<string>('');
   const handleSubmit = async (e: React.FormEvent, typingKeyword: string) => {
     e.preventDefault();
     let pageParam = 0;
@@ -29,27 +22,15 @@ const SearchEngine: React.FC<SearchEngineProps> = ({
   };
 
   return (
-    // <StSearchEngineWrapper
-    //   onSubmit={(e) => {
-    //     e.preventDefault();
-    //     fetchSearchedListByTag(tag, searchKeyword, likes);
-    //   }}
-    // >
     <StSearchEngineWrapper onSubmit={(e) => handleSubmit(e, typingKeyword)}>
       <StSearchIcon src="./search-icon.png" />
       <StSearchEngineBar
         placeholder="Search"
         value={typingKeyword}
         onChange={(e) => {
-          // const typingKeyword = e.target.value;
-          // handleSubmit(e, typingKeyword:string);
-          // setSearchKeyword(e.target.value);
-          // // console.log('searchKeyword', searchKeyword);
-          // typeKeyword(e);
           setTypingKeyword(e.target.value);
         }}
       />
-      {/* searchKeyword:{searchKeyword}TypingKeyword:{typingKeyword} */}
     </StSearchEngineWrapper>
   );
 };

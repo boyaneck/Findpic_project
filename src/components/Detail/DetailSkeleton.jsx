@@ -18,7 +18,7 @@ const SkeletonContainer = styled.div`
 export const CardSkeleton = styled.div`
   width: 500px;
   height: 400px;
-  background-color: gray;
+  background-color: #1d1d1d;
   animation: ${CardAnimation} 1s infinite;
 `;
 

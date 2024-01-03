@@ -5,7 +5,7 @@ import { GetServerSideProps } from 'next';
 import ImgZoom from '@/components/Detail/ImgZoom';
 import { FirebasePhotoData } from '@/type/firebaseDataType';
 import Image from 'next/image';
-import downloadImage from '../../../utils/downloadImage';
+import downloadImage from '../../common/utils/downloadImage';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import PhotoList from '@/components/Detail/PhotoList';
@@ -42,8 +42,6 @@ export default function Detail({ pic, searchTagsResult, error }: Props) {
   // 로그인 유무확인 status 값으로 확인하기
   const { data: session, status } = useSession();
   const user = session?.user?.email;
-
-  // console.log('status', status);
 
   if (error) return <div>{error}</div>;
 

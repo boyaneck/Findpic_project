@@ -61,9 +61,6 @@ export default function SearchFrom({ input, setInput, setPhotos, setIsLoading }:
   // Infinite Scroll FUNCTIONS
   // 스크롤 양이 끝까지 내려가면 API로 이미지 추가 호출
   const loadMoreImages = async () => {
-    console.log('fetching');
-    console.log(input);
-    console.log(page);
     try {
       setIsLoading(true);
       const photosRef = collection(db, 'photos');
@@ -97,9 +94,9 @@ export default function SearchFrom({ input, setInput, setPhotos, setIsLoading }:
   };
 
   useEffect(() => {
+    // DB를 업데이트 할 때 아래 두 개의 함수를 주석 해제
     // getUnsplash();
     // getPixabay();
-    // getDB('dog');
     window.addEventListener('scroll', onScrollHandler); // 스크롤 이벤트
 
     return () => {

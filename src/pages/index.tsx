@@ -44,8 +44,6 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     if (tags === 'man') {
       setTag(tags);
     }
-
-    console.log('태그 눌렀을 때 searchKeyword', searchKeyword);
   };
 
   type paramType = {
@@ -74,17 +72,12 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     }
   });
 
-  console.log('인덱스의 data', data);
-
   const { ref } = useInView({
     threshold: 1,
     onChange: (inView) => {
-      // if (!inView || !hasNextPage) return;
-
-      // TODO: !hasNextPage 추가??
       // 1. 초록색바가 보이면 fetchNextPage를 실행한다.
       if (!inView) return;
-      console.log('fetchNextPage 실행');
+
       fetchNextPage();
     }
   });
@@ -144,8 +137,7 @@ export async function getServerSideProps() {
   try {
     const Snapshot = await getDocs(q);
     const pictureList = Snapshot.docs.map((doc) => doc.data() as PicList);
-    // console.log('pictureList in serversidee', pictureList);
-    // console.error('pictureList in serversidee', pictureList);
+
     // 반환된 데이터를 props로 전달
     return {
       props: {
@@ -153,7 +145,7 @@ export async function getServerSideProps() {
       }
     };
   } catch (error) {
-    // console.log('에러', error);
+    console.log('에러', error);
 
     // 에러 발생 시 빈 배열을 props로 전달
     return {

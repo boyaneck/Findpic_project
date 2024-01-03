@@ -50,7 +50,7 @@ export default function SearchedList({ input, photos, setPhotos, isLoading }: Li
     const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((doc) => {
-      // console.log(doc.id, ' => ', doc.data());
+      // 사용 안 함
     });
   };
 
@@ -138,7 +138,7 @@ export default function SearchedList({ input, photos, setPhotos, isLoading }: Li
 
       return data;
     } catch (err) {
-      // console.log(err);
+      console.log(err);
     }
   };
 
@@ -193,14 +193,12 @@ export default function SearchedList({ input, photos, setPhotos, isLoading }: Li
   const likePic = async (e: MouseEvent<HTMLElement>) => {
     // 좋아요 누른 이미지 id 확인
     const likedImg = e.currentTarget.id;
-    console.log(likedImg);
     // db에서 로그인 된 유저 데이터 찾아서 liked에 이미지 id 추가
     const usersRef = collection(db, 'users');
     const q = query(usersRef, where('email', '==', user?.email));
 
     const currentUser: any = await getDocs(q);
     currentUser.forEach(async (doc: any) => {
-      console.log(doc.ref);
       await updateDoc(doc.ref, { liked: arrayUnion(`${likedImg}`) });
     });
   };

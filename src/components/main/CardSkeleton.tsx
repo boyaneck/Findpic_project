@@ -24,7 +24,7 @@ const CardSkeleton = ({ cards }: { cards: any }) => {
   return Array(cards)
     .fill(0)
     .map((item, i) => (
-      <>
+      <div key={i}>
         <Card_skeleton key={i}>
           <Left_col>
             <Skeleton circle width={50} height={50} style={{ marginLeft: '17.5rem', marginTop: '1.5rem' }} />
@@ -36,7 +36,7 @@ const CardSkeleton = ({ cards }: { cards: any }) => {
             </div>
           </Right_col>
         </Card_skeleton>
-      </>
+      </div>
     ));
 };
 
