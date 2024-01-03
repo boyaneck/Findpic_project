@@ -25,6 +25,7 @@ const StImage = styled.img`
   height: 600px;
   display: block;
   margin: 0 auto;
+  object-fit: cover;
 `;
 
 // const StSkeletonImage = styled(Skeleton.Image)`

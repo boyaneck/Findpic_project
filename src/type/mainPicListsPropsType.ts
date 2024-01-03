@@ -13,4 +13,5 @@ export interface MainPicListsProps {
   likes: sortedByLike;
   searchKeyword: string;
   setLikes: React.Dispatch<React.SetStateAction<sortedByLike>>;
+  isFetchingNextPage: Boolean;
 }

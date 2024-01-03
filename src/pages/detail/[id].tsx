@@ -41,6 +41,8 @@ type Props = {
 export default function Detail({ pic, searchTagsResult, error }: Props) {
   // 로그인 유무확인 status 값으로 확인하기
   const { data: session, status } = useSession();
+  const user = session?.user?.email;
+
   // console.log('status', status);
 
   if (error) return <div>{error}</div>;
@@ -61,7 +63,11 @@ export default function Detail({ pic, searchTagsResult, error }: Props) {
             onClick={() => {
               const imageUrl = `${pic.imgPath}`;
               const imageName = 'find_pic.png';
-              downloadImage(imageUrl, imageName);
+              if (!session?.user) {
+                alert('로그인 후 이용하실 수 있습니다');
+              } else {
+                downloadImage(imageUrl, imageName);
+              }
             }}
           >
             다운로드

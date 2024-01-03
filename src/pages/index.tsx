@@ -55,7 +55,7 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
     likes: string;
   };
 
-  const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery<any[]>({
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery<any[]>({
     queryKey: ['picLists', tag, searchKeyword, likes],
     // 4. pageParam에 getNextPageParam의 return값이 들어온다.
     queryFn: ({ pageParam }): any => {
@@ -115,6 +115,7 @@ function Main({ initialPicLists }: { initialPicLists: InitialPicLists }) {
           searchKeyword={searchKeyword}
           setLikes={setLikes}
           data={data?.pages.map((page: any) => page.data).flat()}
+          isFetchingNextPage={isFetchingNextPage}
         />
       </StMainContainer>
       <div

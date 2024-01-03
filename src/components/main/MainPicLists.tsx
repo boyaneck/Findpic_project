@@ -2,7 +2,7 @@ import { db } from '@/common/firebase_RK';
 import { MainPicListsProps } from '@/type/mainPicListsPropsType';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { PicList } from '@/type/picListsType';
-import { arrayUnion, collection, getDocs, query, updateDoc, where, arrayRemove } from 'firebase/firestore';
+import { arrayUnion, collection, getDocs, query, updateDoc, where, increment } from 'firebase/firestore';
 import { GetServerSideProps } from 'next';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
@@ -38,7 +38,8 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
   data,
   likes,
   searchKeyword,
-  setLikes
+  setLikes,
+  isFetchingNextPage
 }) => {
   const [picLists, setPicLists] = useState<PicList[]>([]);
   const queryClient = useQueryClient();
@@ -69,39 +70,56 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
 
   // 테스트코드
   const handleLikeClick = async (picId: string) => {
-    // 현재 사진이 좋아요되어 있는지 확인
-    const isLiked = likedPics.includes(picId); // include 되어있으면 true
+    if (!session?.user) alert('로그인 후 이용하실 수 있습니다');
+    else {
+      // 현재 사진이 좋아요되어 있는지 확인
+      const isLiked = likedPics.includes(picId); // include 되어있으면 true
 
-    // 좋아요 토글 (좋아요되어 있으면 제거, 아니면 추가)
-    if (isLiked) {
-      const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('email', '==', user));
+      // 좋아요 토글 (좋아요되어 있으면 제거, 아니면 추가)
+      if (isLiked) {
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('email', '==', user));
 
-      const userData = await getDocs(q);
-      userData.forEach(async (data) => {
-        const modifiedData = data.data(); // userData
-        console.log('modifiedData', modifiedData);
-        const changed = { ...modifiedData, liked: modifiedData.liked.filter((id: string) => id !== picId) };
-        console.log('changed', changed);
-        await updateDoc(data.ref, { liked: changed.liked });
-      });
+        const userData = await getDocs(q);
+        userData.forEach(async (data) => {
+          const modifiedData = data.data(); // userData
+          console.log('modifiedData', modifiedData);
+          const changed = { ...modifiedData, liked: modifiedData.liked.filter((id: string) => id !== picId) };
+          console.log('changed', changed);
+          await updateDoc(data.ref, { liked: changed.liked });
+        });
 
-      setLikedPics((prev) => prev.filter((id) => id !== picId));
-      getUserData();
-    } else {
-      // db에서 로그인 된 유저 데이터 찾아서 liked에 이미지 id 추가
-      const usersRef = collection(db, 'users');
+        const photosRef = collection(db, 'photos');
+        const q2 = query(photosRef, where('id', '==', picId));
+        const photoDoc = await getDocs(q2);
+        photoDoc.forEach(async (doc: any) => {
+          await updateDoc(doc.ref, { likes: increment(-1) });
+        });
 
-      const q = query(usersRef, where('email', '==', user));
+        setLikedPics((prev) => prev.filter((id) => id !== picId));
+        getUserData();
+      } else {
+        // db에서 로그인 된 유저 데이터 찾아서 liked에 이미지 id 추가
+        const usersRef = collection(db, 'users');
 
-      // 현재 user의 데이터를 가져옴
-      const currentUser: any = await getDocs(q);
-      currentUser.forEach(async (doc: any) => {
-        await updateDoc(doc.ref, { liked: arrayUnion(`${picId}`) });
-      });
+        const q = query(usersRef, where('email', '==', user));
 
-      setLikedPics((prev) => [...prev, picId]);
-      getUserData();
+        // 현재 user의 데이터를 가져옴
+        const currentUser: any = await getDocs(q);
+        currentUser.forEach(async (doc: any) => {
+          await updateDoc(doc.ref, { liked: arrayUnion(`${picId}`) });
+        });
+
+        const photosRef = collection(db, 'photos');
+        const q2 = query(photosRef, where('id', '==', picId));
+        const photoDoc = await getDocs(q2);
+        photoDoc.forEach(async (doc: any) => {
+          await updateDoc(doc.ref, { likes: increment(1) });
+        });
+
+        setLikedPics((prev) => [...prev, picId]);
+        getUserData();
+      }
     }
   };
 
@@ -178,14 +196,21 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
                     </StPicture>
                   );
                 })}
+                {isFetchingNextPage ? (
+                  <>
+                    {' '}
+                    <div style={{ display: 'flex', padding: '1rem 0', gap: '1rem' }}>
+                      <CardSkeleton cards={3} />
+                    </div>
+                  </>
+                ) : (
+                  <></>
+                )}
               </StPictureCard>
             ) : (
               //네 락균님 ,,음 ... 👍👍👍👍!!
               <div style={{ display: 'flex', padding: '1rem 0', gap: '1rem' }}>
-                <CardSkeleton cards={4} />
-                {/* <SkeletonTheme baseColor="#202020" highlightColor="#444">
-                  <Skeleton count={4} />
-                </SkeletonTheme> */}
+                <CardSkeleton cards={3} />
               </div>
             )}
           </StPictureCardContainer>
@@ -217,7 +242,6 @@ const MainPicLists: React.FC<MainPicListsProps> = ({
                       )}
                     </StLikeWrapper>
                     <div>
-                      sss
                       <Link href={`/detail/${pic.id}`}>
                         <StImage src={pic.imgPath} alt="picture" width={250} height={200} />
                       </Link>
